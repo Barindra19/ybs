@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+
+<!--<![endif]-->
+<!-- BEGIN HEAD -->
+
+<head>
+    {% block metadata %}
+        {% include "admin::partials/metadata" %}
+    {% endblock %}
+
+    {% block css_assets %}
+        {% include "admin::partials/css_assets" %}
+    {% endblock %}
+
+    {% block addcss %}
+
+    {% endblock %}
+
+</head>
+<!-- END HEAD -->
+<body class="page-container-bg-solid">
+    <div class="page-wrapper">
+        <div class="page-wrapper-row">
+            <div class="page-wrapper-top">
+                <!-- BEGIN HEADER -->
+                <div class="page-header">
+                    <!-- BEGIN HEADER TOP -->
+                    <div class="page-header-top">
+                        <div class="container">
+                            <!-- BEGIN LOGO -->
+                            <div class="page-logo">
+                                <a href="{{ url('/home') }}">
+                                    <!-- <h4><strong>YourBags</strong><i>Spa</i></h4> -->
+                                    <img src="{{ asset('images/logo/yourbag.png') }}" alt="logo" class="logo-default" alt="Yourbagspa" style="width:70px;height:50px;margin-top:10px;"/>
+                                </a>
+                            </div>
+                            <!-- END LOGO -->
+                            <!-- BEGIN RESPONSIVE MENU TOGGLER -->
+                            <a href="javascript:;" class="menu-toggler"></a>
+                            <!-- END RESPONSIVE MENU TOGGLER -->
+                            <!-- BEGIN TOP NAVIGATION MENU -->
+                            <div class="top-menu">
+                                <ul class="nav navbar-nav pull-right">
+                                    <!-- BEGIN NOTIFICATION DROPDOWN -->
+                                    <!-- DOC: Apply "dropdown-hoverable" class after "dropdown" and remove data-toggle="dropdown" data-hover="dropdown" data-close-others="true" attributes to enable hover dropdown mode -->
+                                    <!-- BEGIN USER LOGIN DROPDOWN -->
+                                    <li class="dropdown dropdown-user dropdown-dark">
+                                        <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                                            <img alt="{{ call_helpers('get_UsersInformation','name') }}" class="img-circle" src="{{ theme_asset('img/avatar.png') }}">
+                                            <span class="username username-hide-mobile">{{ call_helpers('get_UsersInformation','name') }}</span>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-default">
+                                            {% if call_helpers('bool_CheckUserRole','customer') == TRUE %}
+                                            <li>
+                                                <a href="{{ route('profile_info') }}">
+                                                    <i class="icon-user"></i> My Profile </a>
+                                            </li>
+                                            {% endif %}
+                                            <li>
+                                                <a href="javascript:void(0);" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                                    <i class="icon-key"></i> Log Out </a>
+                                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                                        {{ csrf_field() }}
+                                                    </form>
+
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <!-- END USER LOGIN DROPDOWN -->
+                                </ul>
+                            </div>
+                            <!-- END TOP NAVIGATION MENU -->
+                        </div> <!-- END CONTAINER -->
+                    </div>
+                    <!-- END HEADER TOP -->
+                    <!-- BEGIN HEADER MENU -->
+                    <div class="page-header-menu">
+                        <div class="container">
+                            <!-- BEGIN MEGA MENU -->
+                            <div class="hor-menu">
+                                <ul class="nav navbar-nav">
+
+
+                                    <li aria-haspopup="true" class="menu-dropdown classic-menu-dropdown {{ active_class_path('home', 'active') }}">
+                                        <a href="{{ url('/') }}">
+                                            <i class="icon-home"></i>
+                                            Home
+                                            <span class="arrow"></span>
+                                        </a>
+                                    </li>
+
+                                    {% include "admin::partials/menu" %}
+                                </ul>
+                            </div>
+                            <!-- END MEGA MENU -->
+                        </div>
+                    </div>
+                    <!-- END HEADER MENU -->
+
+
+                </div>
+                 <!-- END HEADER -->
+             </div>
+             <!-- PAGE WRAPPER TOP -->
+         </div>
+         <!-- PAGE WRAPPER ROW -->
+         <div class="page-wrapper-row full-height">
+             <div class="page-wrapper-middle">
+                 <!-- BEGIN CONTAINER -->
+                 <div class="page-container">
+                     <!-- BEGIN CONTENT -->
+                     <div class="page-content-wrapper">
+                         <!-- BEGIN CONTENT BODY -->
+
+                         {% block pageheader %}
+
+
+                         {% endblock %}
+
+
+
+
+                         <!-- BEGIN PAGE CONTENT BODY -->
+                         <div class="page-content">
+                             <div class="container">
+
+                                 {% block breadcrumbs %}
+
+                                 {% endblock %}
+
+
+                                 {% block body %}
+
+                                 {% endblock %}
+
+                             </div>
+                         </div>
+                         <!-- END PAGE CONTENT BODY -->
+                         <!-- END CONTENT BODY -->
+                     </div>
+                     <!-- END CONTENT -->
+                 </div>
+                 <!-- END CONTAINER -->
+             </div>
+         </div>
+
+     </div>
+     <!-- PAGE WRAPPER -->
+ </body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% block addmodal %}
+
+
+
+
+{% endblock %}
+<!-- END QUICK NAV -->
+
+
+
+{% block js_assets %}
+
+    <script>
+        var BASE_URL = '{{ url('/') }}';
+        var CSRF_TOKEN = '{{ csrf_token() }}';
+    </script>
+
+    {% include "admin::partials/js_assets" %}
+
+{% endblock %}
+
+{% block addjs %}
+
+{% endblock %}
+
+</body>
+</html>

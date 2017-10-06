@@ -1,0 +1,573 @@
+{% extends "admin::layouts.layout" %}
+
+{% block addcss %}
+{{ asset('plugins/icheck/skins/all.css')|css_tag }}
+{{ asset('plugins/select2/css/select2.min.css')|css_tag }}
+{{ asset('plugins/select2/css/select2-bootstrap.min.css')|css_tag }}
+
+{{ asset('plugins/bootstrap-toastr/toastr.min.css')| css_tag }}
+
+
+{{ asset('plugins/cubeportfolio/css/cubeportfolio.css')| css_tag }}
+
+{{ asset('plugins/bootstrap-fileinput/bootstrap-fileinput.css') | css_tag }}
+
+{% endblock %}
+
+{% block pageheader %}
+<!-- BEGIN PAGE HEAD-->
+<div class="page-head">
+    <div class="container">
+        <!-- BEGIN PAGE TITLE -->
+        <div class="page-title">
+            <h1>{{ string_menuname }}
+                <small>Form {{ string_menuname }}</small>
+            </h1>
+        </div>
+        <!-- END PAGE TITLE -->
+    </div>
+</div>
+<!-- END PAGE HEAD-->
+
+{% endblock %}
+
+
+{% block breadcrumbs %}
+<!-- BEGIN PAGE BREADCRUMBS -->
+<ul class="page-breadcrumb breadcrumb">
+    <li>
+        <a href="{{ url('/home') }}">Home</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <a href="javascript:void(0)">Order</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        Rincian {{ string_menuname }}
+    </li>
+</ul>
+<!-- END PAGE BREADCRUMBS -->
+{% endblock %}
+
+{% block body %}
+<div class="col-md-12">
+    {% if (session('errMsg')) %}
+        <div class="alert alert-danger">
+            <button class="close" data-close="alert"></button>
+            <span>{{ session('errMsg') }}</span>
+        </div>
+    {% endif %}
+</div>
+<div class="row">
+  <div class="col-md-12">
+      <div class="portlet light ">
+          <div class="portlet-title">
+              <div class="caption">
+                  <i class="fa fa-check font-red"></i>
+                  <span class="caption-subject font-red sbold uppercase">Rincian [{{ Order.ref_number }}]</span>
+              </div>
+              <div class="actions">
+              </div>
+          </div>
+          <div class="portlet-body">
+              <div class="row">
+                  <div class="col-md-12">
+                      <h4>Order Information</h4>
+                      <form class="form-horizontal" role="form">
+                          <div class="form-body">
+                              <hr>
+                              <!-- TRANSACTION_DATE -->
+                              <div class="row">
+                                  <div class="col-md-12">
+                                      <div class="form-group form-md-line-input has-warning">
+                                          <label class="control-label col-md-3">Tanggal Transaksi :</label>
+                                          <div class="col-md-4">
+                                            <input type="text" class="form-control" readonly id="date_transaction" value="{{ call_helpers_two('DateFormat',Order.date_transaction, "d F Y") }}">
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <!-- END  TRANSACTION_DATE -->
+
+                              <!-- INPUT CUSTOMER -->
+                              <div class="row">
+                                  <div class="col-md-12">
+                                      <div class="form-group form-md-line-input has-success">
+                                          <label class="control-label col-md-3">Customer :</label>
+                                          <div class="col-md-6">
+                                            <input type="text" class="form-control" readonly id="customer" value="{{ Order.customer.name }}">
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <!-- END  INPUT CUSTOMER -->
+
+                          </div>
+                      </form>
+                  </div>
+              </div>
+              <hr>
+              <div class="row">
+                  <div class="col-md-12">
+                      <h4>Order Detail</h4>
+                      <hr>
+                      <div class="table-scrollable">
+                          <table class="table table-hover table-light" id="order_detail">
+                              <thead>
+                                  <tr>
+                                      <th> Treatment </th>
+                                      <th> Merk </th>
+                                      <th> kategori </th>
+                                      <th> Paket </th>
+                                      <th> Discount </th>
+                                      <th> Additional </th>
+                                      <th> Total </th>
+                                      <th> Image </th>
+                                      {% if call_helpers('bool_CheckUserRole','customer') == FALSE %}
+                                      <th> </th>
+                                      {% endif %}
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  {%  for item in OrderDetail %}
+                                  <tr id="row{{ item.id }}">
+                                      <td>  {{ item.treatment.name }} </td>
+                                      <td>
+                                          {% if call_helpers('bool_CheckUserRole','customer') == TRUE %}
+                                          {{ item.merk.name }}
+                                          {% else %}
+                                          <select name="merk" class="form-control select2" id="merk{{ item.id }}">
+                                              {% set ListMerk = call_helpers('get_ListMerk') %}
+                                                    {% for key,value in ListMerk %}
+                                                        <option value="{{ key }}" {{ item.merk_id == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                                    {% endfor %}
+                                          </select>
+                                          {% endif %}
+
+                                      </td>
+                                      {% if item.treatment_category_id %}
+                                      <td> {{ item.treatmentcategory.name }} </td>
+                                      {% else %}
+                                      <td> - </td>
+                                      {% endif %}
+                                      <td> {{ item.treatment_package }}  </td>
+
+                                      {% if item.discount > 0 %}
+                                      <td>
+                                          <span class="label label-sm label-danger"> {{ call_helpers('set_numberformat', item.price * item.discount / 100) }} </span>
+                                      </td>
+                                      {% else %}
+                                      <td> - </td>
+                                      {% endif %}
+
+                                      {% if item.additional > 0 %}
+                                      <td>
+                                          <span class="label label-sm label-info"> {{ call_helpers('set_numberformat',item.additional) }} </span>
+                                      </td>
+                                      {% else %}
+                                      <td> - </td>
+                                      {% endif %}
+                                      <td>
+                                          <span class="label label-sm label-success"> {{ call_helpers('set_numberformat',item.total) }} </span>
+                                      </td>
+
+                                      <td id="imageUpload{{ item.id }}">
+                                          {% if call_helpers('get_countorderimage', item.id) > 0 %}
+                                            <a href="javascript:void(0)" onclick="showImage({{ item.id }})">
+                                          {{ call_helpers('get_orderimage',item.id) }}
+                                            </a>
+                                          {% elseif call_helpers('get_countorderimage', item.id) == 0 %}
+                                           -
+                                          {% endif %}
+                                      </td>
+
+                                      {% if call_helpers('bool_CheckUserRole','customer') == FALSE %}
+                                          <td>
+                                              <a href="javascript:void(0)" class="btn btn-outline btn-circle yellow btn-sm black" onclick="EditMerk({{ item.id }})"><i class="fa fa-pencil-square-o"></i> Edit Merk</a>
+                                              <!-- <a href="javascript:void(0)" class="btn btn-outline btn-circle blue btn-sm black" onclick="EditList({{ item.id }})"><i class="fa fa-pencil-square-o"></i> Edit Merk</a> -->
+                                         </td>
+                                      {% endif %}
+
+                                  </tr>
+                                  {% endfor %}
+
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="row">
+                  <div class="col-md-12">
+                      <h4>Pay Information</h4>
+                      <hr>
+                        <!-- BEGIN FORM-->
+                        <form action="{{ route('order_repay') }}" name="form_repay" id="form_repay" class="form-horizontal margin-bottom-40" method="post">
+                            {{ csrf_field() }}
+                            <div class="form-body">
+
+                                <!-- TOTAL -->
+                                <div class="form-group form-md-line-input has-success">
+                                    <label class="col-md-3 control-label">Total</label>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" id="price" name="price" placeholder="price" readonly value="{{ call_helpers('set_numberformat',Order.total) }}">
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div>
+                                <!-- END TOTAL -->
+
+
+                                <!-- DISCOUNT -->
+                                <!-- <div class="form-group form-md-line-input has-success">
+                                    <label class="col-md-3 control-label">Discount</label>
+                                    <div class="col-md-2"> -->
+                                        <input type="hidden" class="form-control discount" id="discount" name="discount" placeholder="0 %" readonly value="{{ Order.discount }}">
+                                        <!-- <div class="form-control-focus"> </div>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <input type="text" class="form-control rupiah" id="nominaldiscount" name="nominaldiscount" placeholder="Rp 0,-" readonly value="{{ call_helpers('set_numberformat',Order.total * Order.discount / 100) }}">
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div> -->
+                                <!-- END DISCOUNT -->
+
+
+                                <!-- ADDITIONAL -->
+                                <!-- <div class="form-group form-md-line-input has-success">
+                                    <label class="col-md-3 control-label">Additional</label>
+                                    <div class="col-md-4"> -->
+                                        <input type="hidden" class="form-control rp" readonly id="additional" name="additional" placeholder="additional" autocomplete="off" value="{{ call_helpers('set_numberformat',Order.additional) }}">
+                                        <!-- <div class="form-control-focus"> </div>
+                                    </div>
+                                </div> -->
+                                <!-- END ADDITIONAL -->
+
+
+                                <div class="row">
+                                    <label class="control-label col-md-3">
+                                  </label>
+                                    <div class="col-md-3" id="loadcalculate">
+                                    </div>
+                                </div>
+                                <hr>
+
+                                <!-- ONGKOS KIRIM -->
+                                <div class="form-group form-md-line-input">
+                                    <label class="col-md-3 control-label">Ongkos kirim</label>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control rp" readonly id="shipping_costs" name="shipping_costs" placeholder="shipping_costs" autocomplete="off" value="{{ call_helpers('set_numberformat',Order.shipping_costs) }}">
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div>
+                                <!-- END ONGKOS KIRIM -->
+
+                                <!-- ALAMAT PENGIRIMAN -->
+                                <div class="form-group form-md-line-input">
+                                    <label class="col-md-3 control-label">Alamat Pengiriman</label>
+                                    <div class="col-md-4">
+                                        <textarea class="form-control" id="shipping_address" name="shipping_address" readonly>{{ Order.shipping_address }}</textarea>
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div>
+                                <!-- END ALAMAT PENGIRIMAN -->
+
+                                <!-- SUBTOTAL -->
+                                <div class="form-group form-md-line-input has-success">
+                                    <label class="col-md-3 control-label">SubTotal</label>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control rp" readonly id="total" name="total" placeholder="total" autocomplete="off" value="{{ call_helpers('set_numberformat',Subtotal) }}">
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div>
+                                <!-- END SUBTOTAL -->
+
+                                <!-- DOWN PAYMENT -->
+                                <div class="form-group form-md-line-input has-success">
+                                    <label class="col-md-3 control-label">Down Payment</label>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control rp" readonly id="payment" name="payment" placeholder="payment" autocomplete="off" value="{{ call_helpers('set_numberformat',Order.down_payment) }}">
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div>
+                                <!-- END DOWN PAYMENT -->
+
+                                {% if Order.full_payment > 0 %}
+                                <!-- FULL PAYMENT -->
+                                <div class="form-group form-md-line-input has-success">
+                                    <label class="col-md-3 control-label">Full Payment</label>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control rp" readonly  name="full_payment" placeholder="full_payment" autocomplete="off" value="{{ call_helpers('set_numberformat',Order.full_payment) }}">
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div>
+                                <!-- END FULL PAYMENT -->
+
+                                {% endif %}
+
+
+                                <!-- TERSISA -->
+                                <div class="form-group form-md-line-input has-success">
+                                    <label class="col-md-3 control-label">Tersisa</label>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control rp" readonly id="payment_left" name="payment_left" placeholder="payment_left" autocomplete="off" value="{{ call_helpers('set_numberformat',Order.payment_left) }}">
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div>
+                                <!-- END TERSISA -->
+
+                                <!-- TYPE -->
+                                <div class="form-group form-md-line-input has-success">
+                                    <label class="col-md-3 control-label">Tipe</label>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" readonly id="type" name="type" placeholder="payment_left" autocomplete="off" value="{{ Type }}">
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div>
+                                <!-- END TYPE -->
+
+                              <div class="row">
+                                  <label class="control-label col-md-3">
+                                </label>
+                                  <div class="col-md-3" id="loadcalculateresult">
+                                  </div>
+                              </div>
+
+                              <!-- TYPE -->
+                              <div class="form-group form-md-line-input has-success">
+                                  <label class="col-md-3 control-label">Tipe Pembayaran</label>
+                                  <div class="col-md-4">
+                                      <input type="text" class="form-control" readonly id="payment_type" name="payment_type" placeholder="payment_type" autocomplete="off" value="{{ call_helpers('set_PaymentType', Order.payment_type_id) }}">
+                                      <div class="form-control-focus"> </div>
+                                  </div>
+                              </div>
+                              <!-- END TYPE -->
+
+
+                              <!-- FULL PAYMENT -->
+                              <div class="form-group form-md-line-input">
+                                  <label class="col-md-3 control-label">Pelunasan</label>
+                                  <div class="col-md-4">
+                                      <input type="text" class="form-control rp" id="full_payment" name="full_payment" placeholder="full_payment" autocomplete="off" value="{{ call_helpers('set_numberformat',Order.payment_left) }}" readonly>
+                                      <div class="form-control-focus"> </div>
+                                  </div>
+                              </div>
+                              <!-- END FULL PAYMENT -->
+
+
+
+                            </div>
+                            <div class="form-actions">
+                                <div class="row">
+                                    <div class="col-md-offset-3 col-md-9">
+                                        <input type="hidden" class="form-control" id="id" name="id" value="{{ Order.id }}" />
+                                        {% if call_helpers('bool_CheckUserRole','customer') == TRUE %}
+                                        <a href="{{ url('/') }}" class="btn btn-default" >Kembali</a>
+                                        {% else %}
+                                        <a href="{{ route('order_show') }}" class="btn btn-default" >Kembali</a>
+                                        {% endif %}
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                        <!-- END FORM-->
+                  </div>
+              </div>
+
+          </div>
+
+      </div>
+  </div>
+      <!-- BEGIN VALIDATION STATES-->
+</div>
+
+
+{% endblock %}
+
+{% block addmodal %}
+
+<!-- EDIT DETAIL -->
+<div id="EditDetail" class="modal fade" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Select2 Demo In Modal</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" name="edit-item" id="edit-item">
+                    {{ csrf_field() }}
+                    <!-- BRAND -->
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Brand</label>
+                        <div class="col-md-8">
+                            <select name="merk" class="form-control select2" id="merk">
+                                {% set ListMerk = call_helpers('get_ListMerk') %}
+                                      {% for key,value in ListMerk %}
+                                          <option value="{{ key }}" {{ MerkID == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                      {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <!-- END BRAND -->
+
+                    <!-- TREATMENT -->
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Treatment</label>
+                        <div class="col-md-8">
+                            <select name="treatment" class="form-control select2" id="treatment">
+                                {% set ListTreatment = call_helpers('get_ListTreatment') %}
+                                      {% for key,value in ListTreatment %}
+                                          <option value="{{ key }}" {{ TreatmentID == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                      {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <!-- END TREATMENT -->
+
+                    <!-- TREATMENT CATEGORY -->
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Treatment Category</label>
+                        <div class="col-md-8">
+                            <select name="category" class="form-control select2" id="category">
+                            </select>
+                            <div id="loadcategory"></div>
+                        </div>
+                    </div>
+                    <!-- END TREATMENT CATEGORY -->
+
+                    <!-- TREATMENT PACKAGE -->
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Treatment Package</label>
+                        <div class="col-md-8">
+                            <select name="package" class="form-control select2" id="package">
+                            </select>
+                            <div id="loadpackage"></div>
+                        </div>
+                    </div>
+                    <!-- END TREATMENT PACKAGE -->
+
+
+                    <!-- HARGA -->
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Harga</label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <input type="text" readonly class="form-control" id="price_display" name="price_display" placeholder="price_display" autocomplete="off" value="0">
+                                <input type="hidden" id="price" name="price">
+                                <span class="input-group-btn">
+                                    <button class="btn green" type="button">Rp</button>
+                                </span>
+                              </div>
+                        </div>
+                    </div>
+                    <!-- END HARGA -->
+
+                    <!-- DISCOUNT -->
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Discount</label>
+                        <div class="col-md-2">
+                            <div class="input-group">
+                                <input type="text" class="form-control discount" id="discount" name="discount" placeholder="discount" autocomplete="off" value="0">
+                                <span class="input-group-btn">
+                                    <button class="btn red" type="button">%</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control rupiah" readonly id="nominaldiscount" name="nominaldiscount" placeholder="nominaldiscount" autocomplete="off" value="0">
+                                <span class="input-group-btn">
+                                    <button class="btn red" type="button">Rp</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <button class="btn" type="button">Total</button>
+                                </span>
+                                <input type="text" class="form-control rp" id="total" name="total" placeholder="total" autocomplete="off" value="0">
+                                <span class="input-group-btn">
+                                    <button class="btn green" type="button">Rp</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END DISCOUNT -->
+
+                    <!-- ADDITIONAL -->
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Additional</label>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control rp" id="additional" name="additional" placeholder="additional" autocomplete="off" value="0">
+                                <span class="input-group-btn">
+                                    <button class="btn green" type="button">Rp</button>
+                                </span>
+                          </div>
+                          <div id="loadcalculate"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="additional_description" name="additional_description" placeholder="Additional Note" autocomplete="off">
+                        </div>
+                    </div>
+                    <!-- END ADDITIONAL -->
+
+                    <input type="hidden" id="order_id" name="order_id" value="{{ order_id }}">
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn dark btn-outline btn-circle" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger mt-ladda-btn ladda-button btn-circle" id="btn-AddItem">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- EDIT DETAIL  -->
+
+{% endblock %}
+
+
+
+{% block addjs %}
+<script>
+    var IMG_SPINNER = '{{ theme_asset('img/input-spinner.gif') }}';
+</script>
+<!-- VALIDATION -->
+{{ asset('plugins/jquery-validation/js/jquery.validate.min.js')|script_tag }}
+{{ asset('plugins/jquery-validation/js/additional-methods.min.js')|script_tag }}
+{{ asset('modules/order/validate.js')|script_tag }}
+
+{{ asset('plugins/cubeportfolio/js/jquery.cubeportfolio.min.js')|script_tag }}
+
+
+{{ asset('plugins/bootstrap-toastr/toastr.min.js')|script_tag }}
+
+<!-- JS IMAGE GALLERY -->
+{{ asset('js/image-gallery/image-gallery.js')|script_tag }}
+
+<!-- DROPDOWN -->
+{{ asset('plugins/select2/js/select2.full.min.js')|script_tag }}
+
+<!-- JS SELECT2 -->
+{{ asset('js/select2/select2.js')|script_tag }}
+
+
+<!-- INPUT-MASK BUNDLE-->
+{{ asset('plugins/jquery-inputmask/jquery.inputmask.bundle.min.js')|script_tag }}
+
+<!-- JS INPUT-MASK -->
+{{ asset('js/input-mask/input-mask.js')|script_tag }}
+
+{{ asset('plugins/bootstrap-fileinput/bootstrap-fileinput.js')|script_tag }}
+
+
+<!-- JS -->
+{{ asset('modules/order/main.js')|script_tag }}
+
+{% endblock %}

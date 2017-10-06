@@ -1,0 +1,27 @@
+<!-- BEGIN GLOBAL MANDATORY STYLES -->
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css"/>
+    {{ asset('plugins/font-awesome/css/font-awesome.min.css')|css_tag }}
+    {{ asset('plugins/simple-line-icons/simple-line-icons.min.css')|css_tag }}
+    {{ asset('plugins/bootstrap/css/bootstrap.min.css')|css_tag }}
+    {{ asset('plugins/bootstrap-switch/css/bootstrap-switch.min.css')|css_tag }}
+
+    <!-- SWEETALERT -->
+    {{ asset('plugins/bootstrap-sweetalert/sweetalert.css')|css_tag }}
+
+<!-- END GLOBAL MANDATORY STYLES -->
+<!-- BEGIN PAGE LEVEL PLUGIN STYLES -->
+<!--        {plugin_css('morris/morris.css')} -->
+<!-- END PAGE LEVEL PLUGIN STYLES -->
+<!-- BEGIN THEME GLOBAL STYLES -->
+    {{ theme_asset('admin::css/components.css')|css_tag }}
+    {{ theme_asset('admin::css/plugins.css')|css_tag }}
+<!-- END THEME GLOBAL STYLES -->
+
+
+<!-- BEGIN THEME LAYOUT STYLES -->
+    {{ theme_asset('admin::css/layout.min.css')|css_tag }}
+    {{ theme_asset('admin::css/themes/default.min.css')|css_tag }}
+    {{ theme_asset('admin::css/custom.min.css')|css_tag }}
+<!-- END THEME LAYOUT STYLES -->
+<!-- END THEME STYLES -->
+    <link rel="shortcut icon" href="favicon.ico"/>

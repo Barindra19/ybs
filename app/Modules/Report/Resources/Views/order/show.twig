@@ -1,0 +1,260 @@
+{% extends "admin::layouts.layout" %}
+
+{% block addcss %}
+{{ asset('plugins/select2/css/select2.min.css')| css_tag }}
+{{ asset('plugins/select2/css/select2-bootstrap.min.css')| css_tag }}
+
+<!-- NOTIFICATION  -->
+{{ asset('plugins/bootstrap-toastr/toastr.min.css')| css_tag }}
+
+
+<!-- DATEPICKER  -->
+{{ asset('plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css')|css_tag }}
+
+
+
+{% endblock %}
+
+
+{% block pageheader %}
+<!-- BEGIN PAGE HEAD-->
+<div class="page-head">
+    <div class="container">
+        <!-- BEGIN PAGE TITLE -->
+        <div class="page-title">
+            <h1>{{ string_active_menu }}
+                <small>Report Transaksi pada order</small>
+            </h1>
+        </div>
+        <!-- END PAGE TITLE -->
+    </div>
+</div>
+<!-- END PAGE HEAD-->
+
+{% endblock %}
+
+
+{% block breadcrumbs %}
+<!-- BEGIN PAGE BREADCRUMBS -->
+<ul class="page-breadcrumb breadcrumb">
+    <li>
+        <a href="{{ url('/home') }}">Home</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <a href="javascript:void(0)">Report</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <span>{{ string_active_menu }}</span>
+    </li>
+</ul>
+<!-- END PAGE BREADCRUMBS -->
+{% endblock %}
+
+
+{% block body %}
+<div class="row">
+    <div class="col-md-12">
+        <!-- BEGIN EXAMPLE TABLE PORTLET-->
+          <div class="portlet light">
+              <div class="portlet-title">
+                  <div class="caption">
+                      <i class="fa fa-list font-yellow-casablanca"></i>
+                      <span class="caption-subject bold font-yellow-casablanca uppercase"> {{ string_active_menu }} {{ string_menuname }} </span>
+                      <span class="caption-helper">Report <span class="label label-success">{{ string_active_menu }}</span> {{ config_get('app.name') }}</span>
+                  </div>
+                  <div class="inputs">
+                 </div>
+              </div>
+              <div class="portlet-body">
+                  {% if(session('scsMsg')) %}
+                      <div class="alert alert-success">
+                          <button class="close" data-close="alert"></button>
+                          <span>{{ session('scsMsg') }}</span>
+                      </div>
+                  {% endif %}
+
+                  {% if errors.any %}
+                      {% for error in errors.all %}
+                          <div class="alert alert-danger">
+                              <button class="close" data-close="alert"></button>
+                              <span>
+                                  {{ error }}
+                              </span>
+                          </div>
+                      {% endfor %}
+                  {% endif %}
+                  <form role="form" action="#" method="post" id="form_reportorder" name="form_reportorder">
+
+                      <div class="row">
+                            <div class="col-md-2">
+                                <select name="branch" class="form-control select2" id="branch">
+                                    {% set ListBranch = call_helpers('get_ListBranch') %}
+                                      {% for key,value in ListBranch %}
+                                          <option value="{{ key }}" {{ BranchID == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                      {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-control select2" name="customer" id="customer">
+                                    {% set ListCustomer = call_helpers('get_ListCustomerbyID', BranchID) %}
+                                      {% for key,value in ListCustomer %}
+                                          <option value="{{ key }}" {{ CustomerID == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                      {% endfor %}
+                                </select>
+                                <div id="loadcustomer">&nbsp;</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group input-large date-picker input-daterange" data-date="{{ call_helpers('get_DateNow','d-m-Y') }}" data-date-format="dd-mm-yyyy">
+                                <input class="form-control" name="from" id="from" type="text" value="{% if ( state == 'WithParam') %} {{ from }} {% else %}{{ call_helpers('get_DateNow','d-m-Y') }} {% endif %}">
+                                <span class="input-group-addon"> to </span>
+                                <input class="form-control" name="to" id="to" type="text" value="{% if ( state == 'WithParam') %} {{ to }} {% else %}{{ call_helpers('get_DateNow','d-m-Y') }} {% endif %}">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <select name="status" class="form-control select2" id="status">
+                                    {% set ListChangedStatus = call_helpers('get_ListChangedStatus') %}
+                                          <option value="">Pilih Status</option>
+                                          {% for key,value in ListChangedStatus %}
+                                              <option value="{{ key }}" {{ Status == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                      {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="btn-group">
+                                    <a class="btn green" href="javascript:;" data-toggle="dropdown" aria-expanded="true">
+                                        <i class="fa fa-check-square-o"></i>&nbsp;
+                                        <i class="fa fa-angle-down"></i>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a href="javascript:void(0);" id="a-ShowReportOrder">
+                                                <i class="fa fa-file-text"></i> Tampilkan </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0);" id="a-ExcelReportOrder">
+                                                <i class="fa fa-file-excel-o"></i> EXCEL </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0);" id="a-PDFReportOrder">
+                                                <i class="fa fa-file-pdf-o"></i> PDF </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                        </div>
+                  </form>
+                  <hr>
+                  <div class="panel panel-info">
+                      <div class="panel-heading">
+                          <h3 class="panel-title"><i class="fa fa-file-text"></i> Hasil Pencarian</h3>
+                      </div>
+                      <div class="panel-body">
+                          <table class="table table-hover table-light" id="tbl_reportorder">
+                              <thead>
+                                  <tr>
+                                      <th>Code</th>
+                                      <th>Customer</th>
+                                      <th>Tanggal</th>
+                                      <th>Tagihan</th>
+                                      <th>Payment</th>
+                                      <th>Status</th>
+                                  </tr>
+                              </thead>
+                              <!--tbody section is required-->
+                              <tbody>
+                                  {% if (ResultOrder) %}
+                                  {% for item in ResultOrder %}
+                                  <tr>
+                                      <td>{{ item.ref_number }}</td>
+                                      <td>{{ item.customer.name }}</td>
+                                      <td>{{ call_helpers_two('DateFormat', item.date_transaction ,"d/m/Y H:i:s" ) }}</td>
+                                      <td><span class="label label-sm label-danger">{{ call_helpers('set_numberformat',item.total) }}</span></td>
+                                      <td><span class="label label-sm label-success">{{ call_helpers('set_numberformat',item.down_payment + item.full_payment) }}</span></td>
+                                      <td>
+                                          {% if (item.status == 6) %}
+                                          <span class="label label-sm label-info">{{ call_helpers('get_statusorder',item.status) }}</span>
+                                          {% else %}
+                                          <span class="label label-sm label-warning">{{ call_helpers('get_statusorder',item.status) }}</span>
+                                          {% endif %}
+                                        </td>
+                                  </tr>
+                                  {% endfor %}
+                                  {% endif %}
+                              </tbody>
+                          </table>
+
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!-- END EXAMPLE TABLE PORTLET-->
+    </div>
+</div>
+{% endblock %}
+
+{% block addmodal %}
+    <!-- Delete -->
+    <div class="modal fade bs-modal-sm" id="ConfirmDelete" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-danger">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Delete Confirmation!</h4>
+                </div>
+                <div class="modal-body">
+                    Are you sure??
+                    <input type="hidden" name="id" id="id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn dark btn-danger" data-dismiss="modal" onclick="ActionDelete()">Delete</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- Delete -->
+
+
+{% endblock %}
+
+{% block addjs %}
+<script>
+    var IMG_SPINNER = '{{ theme_asset('img/input-spinner.gif') }}';
+</script>
+
+<!-- NOTIFICATION -->
+{{ asset('plugins/bootstrap-toastr/toastr.min.js')|script_tag }}
+
+<!-- DROPDOWN -->
+{{ asset('plugins/select2/js/select2.full.min.js')|script_tag }}
+
+<!-- INPUT-MASK BUNDLE-->
+{{ asset('plugins/jquery-inputmask/jquery.inputmask.bundle.min.js')|script_tag }}
+
+<!-- JS INPUT-MASK -->
+{{ asset('js/input-mask/input-mask.js')|script_tag }}
+
+<!-- JS SELECT2 -->
+{{ asset('js/select2/select2.js')|script_tag }}
+
+
+<!-- DATEPICKER -->
+{{ asset('plugins/moment.min.js')|script_tag }}
+{{ asset('plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js')|script_tag }}
+{{ asset('plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js')|script_tag }}
+
+
+<!-- JS DATEPICKER -->
+{{ asset('js/datetimepicker/datetime_picker.js')|script_tag }}
+
+
+<!-- JS -->
+{{ asset('modules/order/main.js')|script_tag }}
+
+
+{% endblock %}

@@ -1,0 +1,13 @@
+<meta charset="utf-8" />
+<title>{{ config_get('app.name') }} {% block app_title %}{% endblock %}</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1" name="viewport" />
+<!-- <meta content="{$Settings->meta_description}" name="description" />
+<meta content="{$Settings->developer_team}" name="author" />
+<meta name="image" content="{base_url()}media/logo/{$Settings->file}" alt="{$Settings->header_name}"> -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
+
+{% block addmeta %}
+
+{% endblock %}

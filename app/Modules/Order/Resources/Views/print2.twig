@@ -1,0 +1,245 @@
+{% extends "admin::layouts.layout_print" %}
+{% block body %}
+
+<style>
+    @page {
+        size: A4;
+        margin: .3in .4in .0in .4in;
+    }
+	p{
+	margin:0;
+	}
+    @media print {
+        html, body {
+            width: 290mm;
+            height: 210mm;
+
+        }
+		p{
+	margin:0;
+	}
+	@page {size: landscape}
+        .page {
+            margin: 0;
+            border: initial;
+            border-radius: initial;
+            width: initial;
+            min-height: initial;
+            box-shadow: initial;
+            background: initial;
+        }
+    }
+</style>
+<div class="container page">
+	<div class="row">
+	<div class="col-xs-6">
+		<div class="row">
+        	<div class="col-xs-6">
+    	          <p><img src="{{ asset('images/logo/yourbag.png') }}" class="img img-responsive" style="max-height:30px;"></p>
+        	      <p>{{ Users.branch.name }} </p>
+                  <p>{{ Users.branch.address | raw }}<p>
+                  <p>Telp :
+                    {% if Users.branch.phone > 0 %}{{ Users.branch.phone }} {% if User.branch.mobile > 0 %} / {% endif %}{% endif %}
+                    {% if Users.branch.mobile > 0 %} {{ Users.branch.mobile }}{% endif %}
+                  </p>
+        	</div>
+        	<div class="col-xs-4 col-xs-offset-2">
+            	<p>{{ Order.ref_number }}</p>
+            	<p>{{ call_helpers_two('DateFormat',Order.date_transaction,'d F Y')  }}</p>
+            	<p>{{ Order.customer_name }} - {{ Order.customer.mobile }}</p>
+        	</div>
+	       </div>
+           <br>
+      <div class="row">
+        <table class="table" border="0">
+            <tr>
+                <th align="center">Type</th>
+                <th align="center">Merk</th>
+                <th align="center">Treatment</th>
+                <th align="center">Detail</th>
+                <th align="center">Harga</th>
+            </tr>
+            {% for item in OrderDetail %}
+            <tr>
+                <td>-</td>
+                <td>{{ item.merk.name }}</td>
+                <td>{{ item.treatment.name }}</td>
+                <td>{% if item.treatment_category_id %}{{ item.treatmentcategory.name }} - {% endif %}{{ item.treatmentpackage.name }}</td>
+                <td align="right">{{ call_helpers('set_numberformat', item.total) }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+    			<td colspan="3">Discount</td>
+    			<td colspan="2" align="right">{{ call_helpers('set_numberformat', Order.discount )}}</td>
+			</tr>
+            <tr>
+    			<td colspan="3">Additional</td>
+    			<td colspan="2" align="right"> {{ call_helpers('set_numberformat', Order.additional )}}</td>
+			</tr>
+            {% if Order.shipping_costs > 0 %}
+            <tr>
+    			<td colspan="3">Ongkos kirim</td>
+    			<td colspan="2" align="right"> {{ call_helpers('set_numberformat', Order.shipping_costs )}}</td>
+			</tr>
+            {% endif %}
+            <tr>
+    			<td colspan="3">Total</td>
+    			<td colspan="2" align="right">{{ call_helpers('set_numberformat', Order.total )}}</td>
+			</tr>
+
+            <!-- JIKA PELUNASAN -->
+            {% if Order.type == 1 %}
+            <tr>
+    			<td colspan="3">DP ( {{ call_helpers('set_PaymentType', Order.payment_type_id )}} )</td>
+    			<td colspan="2" align="right">{{ call_helpers('set_numberformat', Order.down_payment )}}</td>
+			</tr>
+            {% endif %}
+            <!-- END JIKA PELUNASAN -->
+
+			<tr>
+    			<td colspan="3">Bayar ({% if Order.type == 0 %} {{ call_helpers('set_PaymentType', Order.payment_type_id )}} {% else %} {{ call_helpers('set_PaymentType', Order.payment_type_full_id )}} {% endif %})</td>
+    			<td colspan="2" align="right">{% if Order.type == 0 %} {{ call_helpers('set_numberformat', Order.down_payment )}} {% else %} {{ call_helpers('set_numberformat', Order.full_payment )}} {% endif %}</td>
+			</tr>
+
+            <tr>
+    			<td colspan="3">Sisa</td>
+    			<td colspan="2" align="right">{% if Order.payment_left == 0 %} <strong><i>LUNAS</i></strong> {% else %} {{ call_helpers('set_numberformat', Order.payment_left )}} {% endif %}</td>
+			</tr>
+		</table>
+	</div>
+
+	<div class="row">
+		<div class="col-md-5">
+        	<p>I'm agree with terms&condition</p>
+        	<p>Jakarta, {{ DateNow }}</p>
+        	<br/><br/>
+        	<p>______________</p>
+        </div>
+	</div>
+	   <br/>
+    	<div class="row">
+        	<h4>Customer: {{ Order.customer.name }}</h4>
+        	<h4>Tanggal: {{ call_helpers_two('DateFormat',Order.date_transaction,'d F Y')  }}</h4>
+        	<h4>No Order: {{ Order.ref_number }}</h4>
+            <table class="table">
+                <tr>
+                    <td>Service</td>
+                    <td>Brand</td>
+                    <td>Keterangan</td>
+                </tr>
+                {% for item in OrderDetail %}
+                <tr>
+                    <td>{{ item.treatment.name }} {% if item.treatment_category_id %}{{ item.treatmentcategory.name }} - {% endif %}{{ item.treatmentpackage.name }}</td>
+                    <td>{{ item.merk.name }}</td>
+                    <td>____________________</td>
+                </tr>
+                {% endfor %}
+
+            </table>
+    	</div>
+	</div>
+	<div class="col-xs-6">
+		<div class="row">
+	<div class="col-xs-6">
+           <p><img src="{{ asset('images/logo/yourbag.png') }}" class="img img-responsive" style="max-height:30px;"></p>
+           <p>{{ Users.branch.name }} </p>
+           <p>{{ Users.branch.address | raw }}<p>
+           <p>WA :
+             {% if Users.branch.phone > 0 %}{{ Users.branch.phone }} {% if User.branch.mobile > 0 %} / {% endif %}{% endif %}
+             {% if Users.branch.mobile > 0 %} {{ Users.branch.mobile }}{% endif %}
+           </p>
+	</div>
+	<div class="col-xs-4 col-xs-offset-2">
+        <p>{{ Order.ref_number }}</p>
+        <p>{{ call_helpers_two('DateFormat',Order.date_transaction,'d F Y')  }}</p>
+        <p>{{ Order.customer_name }} - {{ Order.customer.mobile }}</p>
+	</div>
+	</div>
+    <br>
+	<div class="row">
+        <table class="table" border="0">
+            <tr>
+                <th align="center">Type</th>
+                <th align="center">Merk</th>
+                <th align="center">Treatment</th>
+                <th align="center">Detail</th>
+                <th align="center">Harga</th>
+            </tr>
+            {% for item in OrderDetail %}
+            <tr>
+                <td>-</td>
+                <td>{{ item.merk.name }}</td>
+                <td>{{ item.treatment.name }}</td>
+                <td>{% if item.treatment_category_id %}{{ item.treatmentcategory.name }} - {% endif %}{{ item.treatmentpackage.name }}</td>
+                <td align="right">{{ call_helpers('set_numberformat', item.total) }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+    			<td colspan="3">Discount</td>
+    			<td colspan="2" align="right">{{ call_helpers('set_numberformat', Order.discount )}}</td>
+			</tr>
+            <tr>
+    			<td colspan="3">Additional</td>
+    			<td colspan="2" align="right"> {{ call_helpers('set_numberformat', Order.additional )}}</td>
+			</tr>
+            {% if Order.shipping_costs > 0 %}
+            <tr>
+    			<td colspan="3">Ongkos kirim</td>
+    			<td colspan="2" align="right"> {{ call_helpers('set_numberformat', Order.shipping_costs )}}</td>
+			</tr>
+            {% endif %}
+            <tr>
+    			<td colspan="3">Total</td>
+    			<td colspan="2" align="right">{{ call_helpers('set_numberformat', Order.total )}}</td>
+			</tr>
+
+            <!-- JIKA PELUNASAN -->
+            {% if Order.type == 1 %}
+            <tr>
+    			<td colspan="3">DP ( {{ call_helpers('set_PaymentType', Order.payment_type_id )}} )</td>
+    			<td colspan="2" align="right">{{ call_helpers('set_numberformat', Order.down_payment )}}</td>
+			</tr>
+            {% endif %}
+            <!-- END JIKA PELUNASAN -->
+
+			<tr>
+    			<td colspan="3">Bayar ({% if Order.type == 0 %} {{ call_helpers('set_PaymentType', Order.payment_type_id )}} {% else %} {{ call_helpers('set_PaymentType', Order.payment_type_full_id )}} {% endif %})</td>
+    			<td colspan="2" align="right">{% if Order.type == 0 %} {{ call_helpers('set_numberformat', Order.down_payment )}} {% else %} {{ call_helpers('set_numberformat', Order.full_payment )}} {% endif %}</td>
+			</tr>
+
+            <tr>
+    			<td colspan="3">Sisa</td>
+    			<td colspan="2" align="right">{% if Order.payment_left == 0 %} <strong><i>LUNAS</i></strong> {% else %} {{ call_helpers('set_numberformat', Order.payment_left )}} {% endif %}</td>
+			</tr>
+		</table>
+	</div>
+
+	<div class="row">
+		<div class="col-md-5">
+        	<p>I'm agree with terms&condition</p>
+        	<p>Jakarta, {{ DateNow }}</p>
+        	<br/><br/>
+        	<p>______________</p>
+	   </div>
+	</div>
+	<br/>
+	<div class="row" style="margin-left:0px;">
+	       <p style="font-size:9px;">Syarat dan Ketentuan
+	              <br/>Pelanggan yang terhormat, berikut ini adalah informasi yang perlu diketahui:
+                  <ul style="font-size:9px;">
+                      <li>Beberapa noda pada proses pembersihan tidak dapat hilang secara sempurna (YBS akan berusaha semaksimal mungkin);</li>
+                      <li>Aroma tidak sedap yang sudah lama tidak dapat hilang dengan sempurna</li>
+                      <li>Warna dapat pudar oleh pencucian,</li>
+                      <li>Noda pena (pada umumnya) tidak dapat dihilangkan dalam proses cleaning;</li>
+                      <li>Pelanggan harap melakukan pengecekan saat pengambilan (adanya keluhan atau saran segera diberikan ditempat, diluar itu bukan menjadi tanggung jawab pihak YBS);</li>
+                      <li>Perbaikan dan costumization (penambahan) dapat berbeda dengan bawaan aslinya;</li>
+                      <li>Apabila barang tidak diambil selama 30 (tiga puluh) hari setelah diberitahukan penyelesaiannya oleh pihak YBS, maka kami tidak bertanggung jawab atas segala kerusakan / kehilangan barang dan dikenakan biaya denda sebesar Rp50.000,00 per barang saat pengambilan</li>
+                      <li>YBS bertanggung jawab atas kerusakan yang disebabkan atas kelalaian pada jasa kami. Ketika timbul kerusakan maka pelanggan berhak atas ganti rugi sebesar 3 (tiga) kali biaya pelayanan jasa tersebut. Kerusakan setelah 48 jam barang diberikan,diluar tanggung jawab kami</li>
+                  <ul>
+            </p>
+	</div>
+	</div>
+	</div>
+</div>
+
+{% endblock %}

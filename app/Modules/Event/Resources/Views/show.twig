@@ -1,0 +1,273 @@
+{% extends "admin::layouts.layout" %}
+
+{% block addcss %}
+{{ asset('plugins/datatables/datatables.min.css')|css_tag }}
+{{ asset('plugins/datatables/plugins/bootstrap/datatables.bootstrap.css')|css_tag }}
+
+{{ asset('plugins/bootstrap-toastr/toastr.min.css')| css_tag }}
+
+
+<!-- DATEPICKER  -->
+{{ asset('plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css')|css_tag }}
+
+{% endblock %}
+
+
+{% block pageheader %}
+<!-- BEGIN PAGE HEAD-->
+<div class="page-head">
+    <div class="container">
+        <!-- BEGIN PAGE TITLE -->
+        <div class="page-title">
+            <h1>{{ string_menuname }}
+                <small>List {{ string_menuname }}</small>
+            </h1>
+        </div>
+        <!-- END PAGE TITLE -->
+    </div>
+</div>
+<!-- END PAGE HEAD-->
+
+{% endblock %}
+
+
+{% block breadcrumbs %}
+<!-- BEGIN PAGE BREADCRUMBS -->
+<ul class="page-breadcrumb breadcrumb">
+    <li>
+        <a href="{{ url('/home') }}">Home</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <span>{{ string_menuname }}</span>
+    </li>
+</ul>
+<!-- END PAGE BREADCRUMBS -->
+{% endblock %}
+
+
+{% block body %}
+<div class="row">
+    <div class="col-md-12">
+        <!-- BEGIN EXAMPLE TABLE PORTLET-->
+          <div class="portlet light">
+              <div class="portlet-title">
+                  <div class="caption">
+                      <i class="fa fa-cog font-yellow-casablanca"></i>
+                      <span class="caption-subject bold font-yellow-casablanca uppercase"> {{ string_active_menu }} {{ string_menuname }} </span>
+                      <span class="caption-helper">List {{ string_menuname }} {{ config_get('app.name') }}</span>
+                  </div>
+                  <div class="inputs">
+                         <a type="button" class="btn btn-default btn-sm" href="{{ route('event_add') }}" title="Form" data-toggle="tooltip"><i class="glyphicon glyphicon-plus"></i> Form</a>
+                 </div>
+              </div>
+              <div class="portlet-body">
+                  {% if(session('scsMsg')) %}
+                      <div class="alert alert-success">
+                          <button class="close" data-close="alert"></button>
+                          <span>{{ session('scsMsg') }}</span>
+                      </div>
+                  {% endif %}
+
+                  {% if errors.any %}
+                      {% for error in errors.all %}
+                          <div class="alert alert-danger">
+                              <button class="close" data-close="alert"></button>
+                              <span>
+                                  {{ error }}
+                              </span>
+                          </div>
+                      {% endfor %}
+                  {% endif %}
+
+                        <table class="table table-hover table-light" id="tbl_{{ datatables}}">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Address</th>
+                                    <th>Phone</th>
+                                    <th>Branch</th>
+                                    <th>Active</th>
+                                    <th>Input Date</th>
+                                    <th>Update Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <!--tbody section is required-->
+                            <tbody></tbody>
+                        </table>
+              </div>
+          </div>
+          <!-- END EXAMPLE TABLE PORTLET-->
+    </div>
+</div>
+{% endblock %}
+
+{% block addmodal %}
+    <!-- RESET SALDO -->
+    <div class="modal fade" id="ModalResetSaldo" role="dialog" tabindex="1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Saldo Information</h4>
+                </div>
+                <div class="modal-body">
+                    <!-- BEGIN FORM-->
+                    <form class="form-horizontal" name="reset-saldo" id="reset-saldo">
+                        {{ csrf_field() }}
+                        <div class="form-body">
+
+                            <!-- SALDO -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-success">
+                                        <label class="control-label col-md-2">Saldo :</label>
+                                        <div class="col-md-2">
+                                          <input type="text" class="form-control" readonly id="info_saldorealtime" >
+                                        </div>
+                                        <label class="control-label col-md-2">Tanggal Update :</label>
+                                        <div class="col-md-3">
+                                          <input type="text" class="form-control" readonly id="info_saldorealtime_date" >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  SALDO -->
+
+                        <!-- SALDO AWAL -->
+                        <div class="form-group" id="row-name">
+                            <label class="control-label col-md-4">Saldo Awal
+                                <span class="required"> * </span>
+                            </label>
+                            <div class="col-md-6">
+                                <div class="input-icon right">
+                                    <i class="fa fa-money"></i>
+                                  <input type="text" class="form-control rupiah" id="saldoawal" name="saldoawal" placeholder="Saldo Awal" autocomplete="off" >
+                                </div>
+                            </div>
+                        </div>
+                        <!-- END SALDO AWAL -->
+
+                        <!-- DATE RESET -->
+                        <div class="form-group" id="row-name">
+                            <label class="control-label col-md-4">Tanggal Reset
+                                <span class="required"> * </span>
+                            </label>
+                            <div class="col-md-3">
+                                <div class="input-icon right">
+                                    <i class="fa fa-calendar"></i>
+                                    <input type="text" class="form-control date-picker" data-date-format="dd-mm-yyyy" id="date_reset" name="date_reset" autocomplete="off" value="{{ DateReset }}"readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- END DATE RESET -->
+
+                        <input type="hidden" id="id_reset" name="id_reset">
+
+                        </div>
+                    </form>
+                    <!-- END FORM-->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn dark btn-outline btn-circle" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger mt-ladda-btn ladda-button btn-circle" id="btn-ResetConfirm"><i class="glyphicon glyphicon-refresh"></i> Reset</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- RESET SALDO  -->
+
+    <!-- CONFIRM RESET -->
+    <div class="modal fade bs-modal-sm" id="ConfirmReset" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-danger">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Reset Confirmation!</h4>
+                </div>
+                <div class="modal-body">
+                    Are you sure??
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal" id="btn-ResetNow">Reset</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- CONFIRM RESET -->
+
+    <!-- Delete -->
+    <div class="modal fade bs-modal-sm" id="ConfirmDelete" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-danger">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Inactive Confirmation!</h4>
+                </div>
+                <div class="modal-body">
+                    Are you sure??
+                    <input type="hidden" name="id" id="id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="ActionDelete()">Inactive</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- Delete -->
+
+
+{% endblock %}
+
+{% block addjs %}
+{{ asset('plugins/datatables/datatables.min.js')|script_tag }}
+{{ asset('plugins/datatables/plugins/bootstrap/datatables.bootstrap.js')|script_tag }}
+
+
+<!-- DATEPICKER -->
+{{ asset('plugins/moment.min.js')|script_tag }}
+{{ asset('plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js')|script_tag }}
+{{ asset('plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js')|script_tag }}
+
+<!-- INPUT-MASK BUNDLE-->
+{{ asset('plugins/jquery-inputmask/jquery.inputmask.bundle.min.js')|script_tag }}
+
+
+<!-- JS INPUT-MASK -->
+{{ asset('js/input-mask/input-mask.js')|script_tag }}
+
+
+<!-- JS DATEPICKER -->
+{{ asset('js/datetimepicker/datetime_picker.js')|script_tag }}
+
+{{ asset('plugins/bootstrap-toastr/toastr.min.js')|script_tag }}
+
+
+<script>
+var ROUTE_DATATABLE = '{{ route('event_datatables') }}';
+
+function deleteList(id){
+    $('#id').val(id);
+    $('#ConfirmDelete').modal('show');
+}
+
+function ActionDelete(){
+    var id = $('#id').val();
+    window.location = BASE_URL + "/event/delete/" + id;
+}
+
+
+</script>
+{{ asset('modules/event/datatable.js')|script_tag }}
+{{ asset('modules/event/main.js')|script_tag }}
+{% endblock %}

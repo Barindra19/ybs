@@ -1,0 +1,199 @@
+{% extends "admin::layouts.layout_blank" %}
+
+{% block addcss %}
+
+{{ asset('plugins/bootstrap-fileinput/bootstrap-fileinput.css') | css_tag }}
+
+{{ asset('plugins/bootstrap-toastr/toastr.min.css')| css_tag }}
+
+{% endblock %}
+{% block body %}
+
+<div class="row">
+  <div class="col-md-12">
+      <!-- BEGIN VALIDATION STATES-->
+      <div class="portlet light portlet-fit portlet-form bordered">
+          <div class="portlet-title">
+              <div class="caption">
+                  <i class="fa fa-upload font-red"></i>
+                  <span class="caption-subject font-red bold uppercase">Selesaikan Proses [{{ Order.ref_number }}] </span>
+              </div>
+          </div>
+          <div class="portlet-body">
+              <!-- BEGIN FORM-->
+              <form name="form_upload_finish" id="form_upload_finish" class="form-horizontal form-bordered" enctype="multipart/form-data" method="post">
+                  {{ csrf_field() }}
+                  <div class="form-body">
+
+                      <!-- DATE TRANSACTION -->
+                      <div class="row">
+                          <div class="col-md-12">
+                              <div class="form-group form-md-line-input has-info">
+                                  <label class="control-label col-md-4">Tanggal Transaksi
+                                  </label>
+                                  <div class="col-md-6">
+                                    <input type="text" class="form-control" readonly id="date_transaction" name="date_transaction" value="{{ call_helpers_two('DateFormat',Order.date_transaction, "d F Y H:i:s")}}">
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <!-- END  DATE TRANSACTION -->
+
+                      <!-- CUSTOMER NAME -->
+                      <div class="row">
+                          <div class="col-md-12">
+                              <div class="form-group form-md-line-input has-info">
+                                  <label class="control-label col-md-4">Customer
+                                  </label>
+                                  <div class="col-md-6">
+                                    <input type="text" class="form-control" readonly id="customer_name" name="customer_name" value="{{ Order.customer_name }}">
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <!-- END  CUSTOMER NAME -->
+
+
+                      <div class="portlet light ">
+                          <div class="portlet-title">
+                              <div class="caption">
+                                  <i class="fa fa-check font-red"></i>
+                                  <span class="caption-subject font-red sbold uppercase">Daftar Detail & Image [{{ Order.ref_number }}]</span>
+                              </div>
+                              <div class="actions">
+                                  <input type="hidden" id="id" name="id" value="{{ order_id }}">
+                                  <button type="button" class="btn btn-success" name="btn-setFinish" id="btn-setFinish" value="Finish"><i class="fa fa-check"></i> Set Finish</button>
+                              </div>
+                          </div>
+                          <div class="portlet-body">
+                              <div class="table-scrollable">
+                                  <table class="table table-hover table-light" id="order_detail">
+                                      <thead>
+                                          <tr class="success">
+                                              <th> Treatment </th>
+                                              <th> Brand </th>
+                                              <th> Category </th>
+                                              <th> Paket </th>
+                                              <th> Image </th>
+                                              <th> Foto Finishing </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          {%  for item in OrderDetail %}
+                                          <tr id="row{{ item.id}}">
+                                              <td>  {{ item.treatment.name }} </td>
+                                              <td> {{ item.merk.name }} </td>
+                                              {% if item.treatment_category_id %}
+                                              <td> {{ item.treatmentcategory.name }} </td>
+                                              {% else %}
+                                              <td> - </td>
+                                              {% endif %}
+                                              <td> {{ item.treatment_package }}  </td>
+                                              <td id="imageUpload{{ item.id }}">
+                                                  {{ call_helpers('get_orderimagefinish',item.id) }}
+                                              </td>
+                                              <td>
+                                                  <a href="javascript:void(0)" class="btn btn-outline btn-circle blue btn-sm black" onclick="Upload({{ item.id }})"><i class="fa fa-cloud-upload"></i> Upload </a>
+                                             </td>
+                                          </tr>
+                                          {% endfor %}
+
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
+
+                    </div>
+
+                </div>
+            </form>
+              <!-- END FORM-->
+          </div>
+          <!-- END VALIDATION STATES-->
+      </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block addmodal %}
+<!-- UPLOAD IMAGE -->
+<div id="AddUploadImage" class="modal fade"  role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-full">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Upload Image - {{ Order.ref_number }}</h4>
+            </div>
+            <div class="modal-body">
+                <!-- BEGIN FORM-->
+                    <div class="form-body">
+                        <!-- TREATMENT -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group form-md-line-input has-warning">
+                                    <div class="col-md-3">
+                                      <input type="text" class="form-control" readonly id="treatment_modal" name="treatment">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" readonly id="merk_modal" name="merk">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" readonly id="category_modal" name="category">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" readonly id="package_modal" name="package">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- END  TREATMENT -->
+                        <br>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <form name="form_upload_finish" id="form_upload_finish" class="form-horizontal form-bordered" enctype="multipart/form-data" method="post">
+                                    {{ csrf_field() }}
+                                    <div class="form-body">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3"></label>
+                                            <div class="col-md-3">
+                                                <input type="hidden" id="order_id" name="order_id" value="{{ order_id }}">
+                                                <input type="hidden" id="order_detail_id" name="order_detail_id">
+                                                <button type="button" class="btn btn-info mt-ladda-btn ladda-button btn-circle" id="btn-addMoreItem"><i class="fa fa-plus"></i> Add</button>
+                                                <button type="submit" class="btn green mt-ladda-btn ladda-button btn-circle" id="btn-StartUpload"><i class="fa fa-cloud-upload"></i> Start Upload</button>
+                                            </div>
+                                        </div>
+                                        <div id="UploadImage">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn dark btn-outline btn-circle" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- END UPLOAD IMAGE  -->
+
+{% endblock %}
+
+{% block addjs %}
+<!-- FILE INPUT -->
+{{ asset('plugins/bootstrap-fileinput/bootstrap-fileinput.js')|script_tag }}
+
+{{ asset('plugins/bootstrap-toastr/toastr.min.js')|script_tag }}
+
+
+<!-- JS -->
+{{ asset('modules/order/main.js')|script_tag }}
+
+
+{% endblock %}

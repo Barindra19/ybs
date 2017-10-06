@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+
+<!-- BEGIN HEAD -->
+
+<head>
+    <meta charset="utf-8" />
+    <title>{{ config_get('app.name') }} {% block app_title %}{% endblock %}</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <!-- <meta content="{$Settings->meta_description}" name="description" />
+    <meta content="{$Settings->developer_team}" name="author" />
+    <meta name="image" content="{base_url()}media/logo/{$Settings->file}" alt="{$Settings->header_name}"> -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css"/>
+    {{ asset('plugins/font-awesome/css/font-awesome.min.css')|css_tag }}
+    {{ asset('plugins/simple-line-icons/simple-line-icons.min.css')|css_tag }}
+    {{ asset('plugins/bootstrap/css/bootstrap.min.css')|css_tag }}
+    {{ asset('plugins/bootstrap-switch/css/bootstrap-switch.min.css')|css_tag }}
+
+    {{ asset('plugins/cubeportfolio/css/cubeportfolio.css')| css_tag }}
+
+<!-- END GLOBAL MANDATORY STYLES -->
+<!-- BEGIN PAGE LEVEL PLUGIN STYLES -->
+<!--        {plugin_css('morris/morris.css')} -->
+<!-- END PAGE LEVEL PLUGIN STYLES -->
+<!-- BEGIN THEME GLOBAL STYLES -->
+    {{ theme_asset('admin::css/components.css')|css_tag }}
+    {{ theme_asset('admin::css/plugins.css')|css_tag }}
+<!-- END THEME GLOBAL STYLES -->
+
+
+<!-- BEGIN THEME LAYOUT STYLES -->
+    {{ theme_asset('admin::css/layout.min.css')|css_tag }}
+    {{ theme_asset('admin::css/themes/default.min.css')|css_tag }}
+    {{ theme_asset('admin::css/custom.min.css')|css_tag }}
+<!-- END THEME LAYOUT STYLES -->
+<!-- END THEME STYLES -->
+    <link rel="shortcut icon" href="favicon.ico"/>
+
+    {{ theme_asset('admin::css/pages/invoice.min.css')|css_tag }}
+
+</head>
+<!-- END HEAD -->
+
+
+
+<body class="page-container-bg-solid">
+<!-- PAGE WRAPPER -->
+<div class="wrapper">
+
+        <div class="page-wrapper-row full-height">
+            <div class="page-wrapper-middle">
+                <!-- BEGIN CONTAINER -->
+                <div class="page-container">
+                    <!-- BEGIN CONTENT -->
+                    <div class="page-content-wrapper">
+                        <div class="page-content">
+                            <div class="container">
+
+                                {% block body %}
+
+                                {% endblock %}
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+</div>
+<!-- END PAGE WRAPPER -->
+
+
+
+
+
+<!-- BEGIN CORE PLUGINS -->
+{{ asset('plugins/jquery.min.js')| script_tag }}
+{{ asset('plugins/bootstrap/js/bootstrap.min.js')| script_tag }}
+{{ asset('plugins/js.cookie.min.js')| script_tag }}
+{{ asset('plugins/jquery-slimscroll/jquery.slimscroll.min.js')| script_tag }}
+{{ asset('plugins/jquery.blockui.min.js')| script_tag }}
+{{ asset('plugins/bootstrap-switch/js/bootstrap-switch.min.js')| script_tag }}
+
+{{ asset('plugins/cubeportfolio/js/jquery.cubeportfolio.min.js')| script_tag }}
+{{ asset('js/image-gallery/image-gallery.js')| script_tag }}
+
+
+{{ theme_asset('admin::js/app.min.js')|script_tag }}
+{{ theme_asset('admin::js/layout/layout.min.js')|script_tag }}
+{{ theme_asset('admin::js/layout/demo.min.js')|script_tag }}
+{{ theme_asset('admin::js/global/quick-sidebar.min.js')|script_tag }}
+{{ theme_asset('admin::js/global/quick-nav.min.js')|script_tag }}
+<!-- END THEME LAYOUT SCRIPTS -->
+
+</body>
+</html>

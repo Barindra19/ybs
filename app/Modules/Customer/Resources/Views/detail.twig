@@ -1,0 +1,196 @@
+{% extends "admin::layouts.layout" %}
+
+{% block addcss %}
+    {{ asset('plugins/datatables/datatables.min.css')|css_tag }}
+    {{ asset('plugins/datatables/plugins/bootstrap/datatables.bootstrap.css')|css_tag }}
+{% endblock %}
+
+
+{% block pageheader %}
+    <!-- BEGIN PAGE HEAD-->
+    <div class="page-head">
+        <div class="container">
+            <!-- BEGIN PAGE TITLE -->
+            <div class="page-title">
+                <h1>{{ string_menuname }}
+                    <small>List {{ string_menuname }}</small>
+                </h1>
+            </div>
+            <!-- END PAGE TITLE -->
+        </div>
+    </div>
+    <!-- END PAGE HEAD-->
+
+{% endblock %}
+
+
+{% block breadcrumbs %}
+    <!-- BEGIN PAGE BREADCRUMBS -->
+    <ul class="page-breadcrumb breadcrumb">
+        <li>
+            <a href="{{ url('/home') }}">Home</a>
+            <i class="fa fa-circle"></i>
+        </li>
+        <li>
+            <a href="javascript:void(0)">Customer</a>
+            <i class="fa fa-circle"></i>
+        </li>
+        <li>
+            <span>{{ string_menuname }}</span>
+        </li>
+    </ul>
+    <!-- END PAGE BREADCRUMBS -->
+{% endblock %}
+
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <div class="dashboard-stat2 ">
+                <div class="display">
+                    <div class="number">
+                        <h3 class="font-green-sharp">
+                            <small class="font-green-sharp"></small>
+                            <span data-counter="counterup" data-value="{{ OrderActive }}">0</span>
+                        </h3>
+                        <small>ORDER ACTIVE</small>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-money"></i>
+                    </div>
+                </div>
+                <div class="progress-info">
+                    <div class="status">
+                        <div class="status-title"> Per {{ call_helpers('get_DateNow','l, d F Y') }} </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <div class="dashboard-stat2 ">
+                <div class="display">
+                    <div class="number">
+                        <h3 class="font-red-haze">
+                            <span data-counter="counterup" data-value="{{ OrderLunas }}">0</span>
+                        </h3>
+                        <small>INVOICE</small>
+                    </div>
+                    <div class="icon">
+                        <i class="icon-docs"></i>
+                    </div>
+                </div>
+                <div class="progress-info">
+                    <div class="status">
+                        <div class="status-title"> Per {{ call_helpers('get_DateNow','l, d F Y') }} </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <div class="dashboard-stat2 ">
+                <div class="display">
+                    <div class="number">
+                        <h3 class="font-blue-sharp">
+                            <span data-counter="counterup" data-value="{{ call_helpers('set_numberformatNotmal',OrderSum ) }}">0</span>
+                        </h3>
+                        <small>TRANSACTION</small>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-exchange"></i>
+                    </div>
+                </div>
+                <div class="progress-info">
+                    <div class="status">
+                        <div class="status-title"> Per </div>
+                        <div class="status-number"> {{ call_helpers('get_DateNow','l, d F Y') }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <div class="dashboard-stat2 ">
+                <div class="display">
+                    <div class="number">
+                        <h3 class="font-blue-sharp">
+                            <span data-counter="counterup" data-value="{{ CustomePoint }}">0</span>
+                        </h3>
+                        <small>POINT</small>
+                    </div>
+                    <div class="icon">
+                        <i class="icon-wallet"></i>
+                    </div>
+                </div>
+                <div class="progress-info">
+                    <div class="status">
+                        <div class="status-title"> Per </div>
+                        <div class="status-number"> {{ call_helpers('get_DateNow','l, d F Y') }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <!-- BEGIN EXAMPLE TABLE PORTLET-->
+            <div class="portlet light">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="fa fa-cog font-blue-casablanca"></i>
+                        <span class="caption-subject bold font-blue-casablanca uppercase"> My Order History</span>
+                    </div>
+                    <div class="inputs">
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <table class="table table-hover table-light" id="tbl_home_order">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Kode</th>
+                            <th>Tanggal Transaksi</th>
+                            <th>Pembayaran</th>
+                            <th>Sisa Tagihan</th>
+                            <th>Lunas</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <!--tbody section is required-->
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- END EXAMPLE TABLE PORTLET-->
+        </div>
+    </div>
+{% endblock %}
+
+{% block addmodal %}
+
+{% endblock %}
+
+{% block addjs %}
+    {{ asset('plugins/datatables/datatables.min.js')|script_tag }}
+    {{ asset('plugins/datatables/plugins/bootstrap/datatables.bootstrap.js')|script_tag }}
+
+    {{ asset('plugins/counterup/jquery.waypoints.min.js')| script_tag }}
+    {{ asset('plugins/counterup/jquery.counterup.min.js')| script_tag }}
+
+
+    <script>
+        var ROUTE_DATATABLE_ORDER = '{{ route('customerlist_datatables_detail', CustomerID) }}';
+
+        function deleteList(id){
+            $('#id').val(id);
+            $('#ConfirmDelete').modal('show');
+        }
+
+        function ActionDelete(){
+            var id = $('#id').val();
+            window.location = BASE_URL + "/customer/delete/" + id;
+        }
+
+    </script>
+    {{ asset('modules/datatable.js') | script_tag }}
+{% endblock %}

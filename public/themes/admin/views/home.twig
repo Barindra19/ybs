@@ -1,0 +1,655 @@
+{% extends "admin::layouts.layout" %}
+
+{% block css_assets %}
+    {{ parent() }}
+    {{ asset('plugins/select2/css/select2.min.css')| css_tag }}
+    {{ asset('plugins/select2/css/select2-bootstrap.min.css')| css_tag }}
+
+
+    {{ asset('plugins/datatables/datatables.min.css') | css_tag }}
+    {{ asset('plugins/datatables/plugins/bootstrap/datatables.bootstrap.css') | css_tag }}
+
+    <!-- NOTIFICATION -->
+    {{ asset('plugins/bootstrap-toastr/toastr.min.css') | css_tag }}
+
+{% endblock %}
+
+{% block pageheader %}
+
+<!-- BEGIN PAGE HEAD-->
+<div class="page-head">
+    <div class="container">
+        <!-- BEGIN PAGE TITLE -->
+        <div class="page-title">
+            <h1>Home
+                <small>Home & statistics</small>
+            </h1>
+        </div>
+        <!-- END PAGE TITLE -->
+    </div>
+</div>
+<!-- END PAGE HEAD-->
+
+{% endblock %}
+
+
+{% block breadcrumbs %}
+<!-- BEGIN PAGE BREADCRUMBS -->
+<ul class="page-breadcrumb breadcrumb">
+    <li>
+        <a href="index.html">Home</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <span>Dashboard</span>
+    </li>
+</ul>
+<!-- END PAGE BREADCRUMBS -->
+{% endblock %}
+
+
+{% block addjs %}
+    {{ asset('plugins/datatables/datatables.min.js')|script_tag }}
+    {{ asset('plugins/datatables/plugins/bootstrap/datatables.bootstrap.js')|script_tag }}
+
+    {{ asset('plugins/counterup/jquery.waypoints.min.js')| script_tag }}
+    {{ asset('plugins/counterup/jquery.counterup.min.js')| script_tag }}
+
+    {{ asset('plugins/amcharts/amcharts/amcharts.js')| script_tag }}
+    {{ asset('plugins/amcharts/amcharts/serial.js')| script_tag }}
+    {{ asset('plugins/amcharts/amcharts/pie.js')| script_tag }}
+    {{ asset('plugins/amcharts/amcharts/radar.js')| script_tag }}
+    {{ asset('plugins/amcharts/amcharts/themes/light.js')| script_tag }}
+    {{ asset('plugins/amcharts/amcharts/themes/patterns.js')| script_tag }}
+    {{ asset('plugins/amcharts/amcharts/themes/chalk.js')| script_tag }}
+    <script>
+    var DATA = JSON.parse('{{ call_helpers('set_json_encode', DataLastWeek) }}');
+
+    var ROUTE_DATATABLE_ORDER = '{{ route('home_order_datatables') }}';
+
+    </script>
+    <!-- DROPDOWN -->
+    {{ asset('plugins/select2/js/select2.full.min.js')|script_tag }}
+    <!-- JS SELECT2 -->
+    {{ asset('js/select2/select2.js')|script_tag }}
+
+
+    <!-- INPUT-MASK BUNDLE-->
+    {{ asset('plugins/jquery-inputmask/jquery.inputmask.bundle.min.js') | script_tag }}
+
+    <!-- JS INPUT-MASK -->
+    {{ asset('js/input-mask/input-mask.js') | script_tag }}
+
+    <!-- NOTIFICATION -->
+    {{ asset('plugins/bootstrap-toastr/toastr.min.js') | script_tag }}
+
+
+
+    {{ asset('modules/dashboard.js') | script_tag }}
+    {{ asset('modules/datatable.js') | script_tag }}
+    {{ asset('modules/main.js') | script_tag }}
+
+{% endblock %}
+
+{% block body %}
+    {% if call_helpers('bool_CheckUserRole','customer') != TRUE %}
+        <div class="row ">
+            <div class="col-md-6">
+                <!-- BEGIN SAMPLE FORM PORTLET-->
+                <div class="portlet light ">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="fa fa-barcode font-dark"></i>
+                            <span class="caption-subject font-dark bold uppercase">Cari Customer & Transaksi</span>
+                        </div>
+                        <div class="actions">
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <h4>Masukan Barcode</h4>
+                            <form class="form-inline" id="form-search-barcode">
+                            <div class="form-group">
+                                <label class="sr-only" for="BarcodeScan">Barcode</label>
+                                <input type="text" class="form-control barcode" id="barcode_scan" placeholder="13 Digits"></div>
+                            <button type="button" class="btn btn-default" id="btn-ClearTxtBarcode">Clear</button>
+                            <button type="button" class="btn btn-success">Cari</button>
+                        </form>
+                    </div>
+                </div>
+                <!-- END SAMPLE FORM PORTLET-->
+            </div>
+        </div>
+        {% if call_helpers('bool_CheckUserRole','owner') == TRUE %}
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat2 ">
+                        <div class="display">
+                            <div class="number">
+                                <h3 class="font-green-sharp">
+                                    <small class="font-green-sharp">Rp</small>
+                                    <span data-counter="counterup" data-value="{{ TransactionDebitTodayInMyBranch }}">0</span>
+                                </h3>
+                                <small>TOTAL INCOME</small>
+                            </div>
+                            <div class="icon">
+                                <i class="fa fa-money"></i>
+                            </div>
+                        </div>
+                        <div class="progress-info">
+                            <div class="status">
+                                <div class="status-title"> {{ Branch }} </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat2 ">
+                        <div class="display">
+                            <div class="number">
+                                <h3 class="font-red-haze">
+                                    <span data-counter="counterup" data-value="{{ CountTransactionInBranchToday }}">0</span>
+                                </h3>
+                                <small>TOTAL TRANSACTION</small>
+                            </div>
+                            <div class="icon">
+                                <i class="icon-basket"></i>
+                            </div>
+                        </div>
+                        <div class="progress-info">
+                            <div class="status">
+                                <div class="status-title"> On {{ call_helpers('get_DateNow','l, d F Y') }} </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat2 ">
+                        <div class="display">
+                            <div class="number">
+                                <h3 class="font-blue-sharp">
+                                    <span data-counter="counterup" data-value="{{ CountNewCustomerTodayInBranch }}">0</span>
+                                </h3>
+                                <small>NEW CUSTOMER</small>
+                            </div>
+                            <div class="icon">
+                                <i class="icon-user"></i>
+                            </div>
+                        </div>
+                        <div class="progress-info">
+                            <div class="status">
+                                <div class="status-title"> Yesterday </div>
+                                <div class="status-number"> {{ CountNewCustomerYesterdayInBranch }} customer</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 col-xs-12 col-sm-12">
+                    <div class="portlet light ">
+                        <div class="portlet-title">
+                            <div class="caption ">
+                                <span class="caption-subject font-dark bold uppercase">Transaction</span>
+                                <span class="caption-helper">{{ Branch }}</span>
+                            </div>
+                            <div class="actions">
+                                <div class="btn-group">
+                                    <a class="btn green btn-sm" href="javascript:;" data-toggle="dropdown" aria-expanded="true">
+                                        <i class="fa fa-list"></i> Pilih Cabang
+                                        <i class="fa fa-angle-down"></i>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        {% set ListBranch = call_helpers('get_ListBranchActive')%}
+                                        {% for Branch in ListBranch %}
+                                            {% set BranchName = call_helpers_three('set_str_replace', Branch.name, "", "YOUR BAG SPA ") %}
+                                        <li>
+                                            <a href="{{ route('home_by_branch',Branch.id) }}">
+                                                <i class="fa fa-{% if Branch.id == BranchID %}check{% else %}circle-o-notch{% endif %}"></i> {{ BranchName }} </a>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+
+
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="dashboard_amchart_3" class="CSSAnimationChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        {% endif %}
+    {% elseif call_helpers('bool_CheckUserRole','customer') == TRUE %}
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="dashboard-stat2 ">
+                    <div class="display">
+                        <div class="number">
+                            <h3 class="font-green-sharp">
+                                <small class="font-green-sharp"></small>
+                                <span data-counter="counterup" data-value="{{ OrderActive }}">0</span>
+                            </h3>
+                            <small>ORDER ACTIVE</small>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-money"></i>
+                        </div>
+                    </div>
+                    <div class="progress-info">
+                        <div class="status">
+                            <div class="status-title"> Per {{ call_helpers('get_DateNow','l, d F Y') }} </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="dashboard-stat2 ">
+                    <div class="display">
+                        <div class="number">
+                            <h3 class="font-red-haze">
+                                <span data-counter="counterup" data-value="{{ OrderLunas }}">0</span>
+                            </h3>
+                            <small>INVOICE</small>
+                        </div>
+                        <div class="icon">
+                            <i class="icon-docs"></i>
+                        </div>
+                    </div>
+                    <div class="progress-info">
+                        <div class="status">
+                            <div class="status-title"> Per {{ call_helpers('get_DateNow','l, d F Y') }} </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="dashboard-stat2 ">
+                    <div class="display">
+                        <div class="number">
+                            <h3 class="font-blue-sharp">
+                                <span data-counter="counterup" data-value="{{ call_helpers('set_numberformatNotmal',OrderSum ) }}">0</span>
+                            </h3>
+                            <small>TRANSACTION</small>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-exchange"></i>
+                        </div>
+                    </div>
+                    <div class="progress-info">
+                        <div class="status">
+                            <div class="status-title"> Per </div>
+                            <div class="status-number"> {{ call_helpers('get_DateNow','l, d F Y') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="dashboard-stat2 ">
+                    <div class="display">
+                        <div class="number">
+                            <h3 class="font-blue-sharp">
+                                <span data-counter="counterup" data-value="{{ CustomePoint }}">0</span>
+                            </h3>
+                            <small>POINT</small>
+                        </div>
+                        <div class="icon">
+                            <i class="icon-wallet"></i>
+                        </div>
+                    </div>
+                    <div class="progress-info">
+                        <div class="status">
+                            <div class="status-title"> Per </div>
+                            <div class="status-number"> {{ call_helpers('get_DateNow','l, d F Y') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <!-- BEGIN EXAMPLE TABLE PORTLET-->
+              <div class="portlet light">
+                  <div class="portlet-title">
+                      <div class="caption">
+                          <i class="fa fa-cog font-blue-casablanca"></i>
+                          <span class="caption-subject bold font-blue-casablanca uppercase"> My Order History</span>
+                      </div>
+                      <div class="inputs">
+                     </div>
+                  </div>
+                  <div class="portlet-body">
+                            <table class="table table-hover table-light" id="tbl_home_order">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Kode</th>
+                                        <th>Tanggal Transaksi</th>
+                                        <th>Pembayaran</th>
+                                        <th>Sisa Tagihan</th>
+                                        <th>Lunas</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <!--tbody section is required-->
+                                <tbody></tbody>
+                            </table>
+                  </div>
+              </div>
+              <!-- END EXAMPLE TABLE PORTLET-->
+        </div>
+    </div>
+    {% endif %}
+
+
+{% endblock %}
+
+
+{% block addmodal %}
+    <!-- VIEW DETAIL -->
+    <div class="modal fade bs-modal-md" id="ViewOrder" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">View Detail - <label id="ref_number"></label></h4>
+                </div>
+                <div class="modal-body">
+                    <!-- BEGIN FORM-->
+                        <div class="form-body">
+
+                            <!-- DATE TRANSACTION -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Tanggal Transaksi
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="date_transaction" name="date_transaction">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  DATE TRANSACTION -->
+
+                            <!-- CUSTOMER NAME -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Customer
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="customer_name" name="customer_name">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  CUSTOMER NAME -->
+
+                            <!-- TOTAL -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Total
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="total" name="total">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  TOTAL -->
+
+                            <!-- DISCOUNT -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Discount
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="nominaldiscount" name="nominaldiscount">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  DISCOUNT -->
+
+                            <!-- ADDITIONAL -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Additional
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="additional" name="additional">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  ADDITIONAL -->
+
+                            <!-- DOWN PAYMENT -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Down Payment
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="down_payment" name="down_payment">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  DOWN PAYMENT -->
+
+                            <!-- PELUNASAN -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Pelunasan
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="full_payment" name="full_payment">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  PELUNASAN -->
+
+
+                            <!-- PAYMENT LEFT -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Sisa
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="payment_left" name="payment_left">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  PAYMENT LEFT -->
+
+                            <!-- PAID -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Lunas
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="paid" name="paid">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  PAID -->
+
+
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <input id="order_id" type="hidden" name="id">
+                    <button type="button" class="btn purple btn-outline btn-circle" id="btn-ViewDetailOrder"><i class="fa fa-list-alt"></i> Lihat Rincian</button>
+                    <button type="button" class="btn yellow btn-outline btn-circle" id="btn-PrintInvoice"><i class="glyphicon glyphicon-print"></i> Invoice</button>
+                    <button type="button" class="btn red btn-outline btn-circle" id="btn-TakeItems"><i class="glyphicon glyphicon-saved"></i> Ubah Status</button>
+                    <button type="button" class="btn green btn-outline btn-circle" id="btn-Repayable"><i class="fa fa-money"></i> Pelunasan</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- VIEW DETAIL  -->
+
+
+    <!-- VIEW CUSTOMER -->
+    <div class="modal fade bs-modal-md" id="ViewCustomer" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Customer Detail - <label id="ref_number_customer"></label></h4>
+                </div>
+                <div class="modal-body">
+                    <!-- BEGIN FORM-->
+                        <div class="form-body">
+
+                            <!-- CUSTOMER NAME -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Customer
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="customer_fullname" name="customer_fullname">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  CUSTOMER NAME -->
+
+                            <!-- ADDRESS -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Address
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="customer_address" name="customer_address">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  ADDRESS -->
+
+                            <!-- PHONE -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Phone
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="customer_phone" name="customer_phone">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  PHONE -->
+
+                            <!-- EMAIL -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Email
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="customer_email" name="customer_email">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  EMAIL -->
+
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <input id="customer_id" type="hidden" name="id">
+                    <button type="button" class="btn blue btn-outline btn-circle" id="btn-DetailCustomer"><i class="fa fa-list-alt"></i> Detail Customer</button>
+                    <button type="button" class="btn purple btn-outline btn-circle" id="btn-OrderTreatmentNow"><i class="fa fa-list-alt"></i> Order Treatment</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- VIEW CUSTOMER  -->
+
+    <!-- CHANGED STATUS -->
+    <div class="modal fade" id="ChangedStatus" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Ubah Status!</h4>
+                </div>
+                <div class="modal-body">
+
+                    <form class="form-horizontal" role="form">
+                        <div class="form-body">
+                            <!-- STATUS -->
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                  <div class="input-icon right">
+                                      <i class="fa"></i>
+                                      <select name="status" class="form-control select2" id="status_changed">
+                                          {% set ListChangedStatus = call_helpers('get_ListChangedStatus') %}
+                                                <option value="">Pilih Status</option>
+                                                {% for key,value in ListChangedStatus %}
+                                                    <option value="{{ key }}" {{ Status == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                            {% endfor %}
+                                      </select>
+                                  </div>
+                                   </div>
+                            </div>
+                            <!-- END STATUS -->
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" id="btn-ChangedStatusNow">Ubah</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- CHANGED STATUS -->
+
+    <!-- ERROR MESSAGE -->
+    <div class="modal fade bs-modal-sm" id="ShowErrMsg" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-danger">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Warning!</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="msgError"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- ERROR MESSAGE -->
+
+{% endblock %}

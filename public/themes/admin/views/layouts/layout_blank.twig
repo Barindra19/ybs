@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<!-- BEGIN HEAD -->
+
+<head>
+    {% block metadata %}
+        {% include "admin::partials/metadata" %}
+    {% endblock %}
+
+    {% block css_assets %}
+        {% include "admin::partials/css_assets" %}
+    {% endblock %}
+
+    {% block addcss %}
+
+    {% endblock %}
+
+</head>
+<!-- END HEAD -->
+
+
+
+<body>
+<!-- PAGE WRAPPER -->
+<div class="wrapper">
+
+
+    <!-- BEGIN CONTAINER -->
+    <div class="page-container">
+
+
+            <!-- BEGIN CONTENT BODY -->
+            <div class="page-content">
+
+                {% block body %}
+
+                {% endblock %}
+
+            </div>
+    </div>
+    <!-- END BEGIN CONTENT -->
+</div>
+<!-- END PAGE WRAPPER -->
+
+
+<script>
+    var BASE_URL = '{{ url('/') }}';
+    var CSRF_TOKEN = '{{ csrf_token() }}';
+</script>
+
+
+
+{% block addmodal %}
+
+{% endblock %}
+<!-- END QUICK NAV -->
+
+{% block js_assets %}
+    {% include "admin::partials/js_assets" %}
+{% endblock %}
+
+{% block addjs %}
+
+{% endblock %}
+
+
+</body>
+</html>

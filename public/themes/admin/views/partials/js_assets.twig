@@ -1,0 +1,53 @@
+<!--[if lt IE 9]>
+<script src="../assets/global/plugins/respond.min.js"></script>
+<script src="../assets/global/plugins/excanvas.min.js"></script>
+<script src="../assets/global/plugins/ie8.fix.min.js"></script>
+<![endif]-->
+
+<script>
+    window.Laravel = {{ {'csrfToken': csrf_token()}|json_encode()|raw }};
+    window.userid = {{ call_helpers('get_UsersInformation','id') }};
+    window.username = "{{ call_helpers('get_UsersInformation','name') }}";
+
+
+</script>
+<!-- BEGIN CORE PLUGINS -->
+{{ asset('plugins/jquery.min.js')|script_tag }}
+{{ asset('plugins/bootstrap/js/bootstrap.min.js')|script_tag }}
+{{ asset('plugins/js.cookie.min.js')|script_tag }}
+{{ asset('plugins/jquery-slimscroll/jquery.slimscroll.min.js')|script_tag }}
+{{ asset('plugins/jquery.blockui.min.js')|script_tag }}
+{{ asset('plugins/bootstrap-switch/js/bootstrap-switch.min.js')|script_tag }}
+
+<!-- DRAGGABLE -->
+{{ asset('plugins/jquery-ui/jquery-ui.min.js')|script_tag }}
+
+<!-- SWEET ALERT -->
+{{ asset('plugins/bootstrap-sweetalert/sweetalert.min.js')|script_tag }}
+<!-- END CORE PLUGINS -->
+
+
+<!-- CALL DRAGGABLE -->
+{{ asset('js/draggable/draggable.js')|script_tag }}
+
+<!-- CALL SWEET ALERT -->
+{{ asset('js/sweetalert/ui-sweetalert.js')|script_tag }}
+
+
+
+<!-- BEGIN PAGE LEVEL PLUGINS -->
+<!--        {plugin_js('morris/morris.min.js')} -->
+<!--        {plugin_js('morris/raphael-min.js')} -->
+<!-- END PAGE LEVEL PLUGINS -->
+{#<!-- BEGIN THEME GLOBAL SCRIPTS -->#}
+{{ theme_asset('admin::js/app.min.js')|script_tag }}
+<!-- {plugin_js('../scripts/dashboard.min.js')} -->
+<!-- END THEME GLOBAL SCRIPTS -->
+<!-- BEGIN PAGE LEVEL SCRIPTS -->
+<!-- END PAGE LEVEL SCRIPTS -->
+<!-- BEGIN THEME LAYOUT SCRIPTS -->
+{{ theme_asset('admin::js/layout/layout.min.js')|script_tag }}
+{{ theme_asset('admin::js/layout/demo.min.js')|script_tag }}
+{{ theme_asset('admin::js/global/quick-sidebar.min.js')|script_tag }}
+{{ theme_asset('admin::js/global/quick-nav.min.js')|script_tag }}
+<!-- END THEME LAYOUT SCRIPTS -->

@@ -1,0 +1,197 @@
+{% extends "admin::layouts.layout" %}
+
+{% block addcss %}
+{{ asset('plugins/select2/css/select2.min.css')| css_tag }}
+{{ asset('plugins/select2/css/select2-bootstrap.min.css')| css_tag }}
+
+<!-- DATEPICKER  -->
+{{ asset('plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css')|css_tag }}
+
+<!-- WYSIHTML -->
+{{ asset('plugins/bootstrap-wysihtml5/bootstrap-wysihtml5.css')|css_tag }}
+
+
+{% endblock %}
+
+{% block pageheader %}
+<!-- BEGIN PAGE HEAD-->
+<div class="page-head">
+    <div class="container">
+        <!-- BEGIN PAGE TITLE -->
+        <div class="page-title">
+            <h1>{{ string_menuname }}
+                <small>{{ form_name }}</small>
+            </h1>
+        </div>
+        <!-- END PAGE TITLE -->
+    </div>
+</div>
+<!-- END PAGE HEAD-->
+
+{% endblock %}
+
+
+{% block breadcrumbs %}
+<!-- BEGIN PAGE BREADCRUMBS -->
+<ul class="page-breadcrumb breadcrumb">
+    <li>
+        <a href="{{ url('/home') }}">Home</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <a href="javascript:void(0)">{{ string_menuname }}</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <span>{{ form_name }}</span>
+    </li>
+</ul>
+<!-- END PAGE BREADCRUMBS -->
+{% endblock %}
+
+{% block body %}
+
+<div class="row">
+  <div class="col-md-12">
+      <!-- BEGIN VALIDATION STATES-->
+      <div class="portlet light">
+          <div class="portlet-body">
+              <div class="tabbable tabbable-tabdrop">
+                  <ul class="nav nav-tabs">
+                      <li class="active">
+                          <a href="javascript:void(0)" aria-expanded="false">Member Info</a>
+                      </li>
+                      <li >
+                          <a href="{{ route ('profile_changed_password') }}" aria-expanded="false">Changed Password</a>
+                      </li>
+                  </ul>
+                  <div class="tab-content">
+                        {% if (session('ScsMsg')) %}
+                        <div class="alert alert-success">
+                            <strong>Success!</strong> {{ session('ScsMsg') }}
+                        </div>
+                        {% endif %}
+
+                        {% if (session('ErrMsg')) %}
+                        <div class="alert alert-danger">
+                            <strong>Error!</strong> {{ session('ErrMsg') }}
+                        </div>
+                        {% endif %}
+
+                      <!-- FORM -->
+                      <form action="{{ route('profile_info_saved') }}" name="form_{{ form }}" id="form_{{ form }}" class="form-horizontal" method="post">
+                          {{ csrf_field() }}
+                          <div class="form-body">
+
+                              <!-- NAME -->
+                              <div class="form-group {% if (errors.has('name')) %}has-error{% endif %}">
+                                  <label class="control-label col-md-2">Name
+                                      <span class="required"> * </span>
+                                  </label>
+                                    <div class="col-md-6">
+                                        <div class="input-icon right">
+                                            <i class="fa fa-user"></i>
+                                            <input type="text" class="form-control" id="name" name="name" placeholder="Name" autocomplete="off" value="{% if state == 'add' %}{{ old('name') }}{% else %}{{ Customer.name }}{% endif %}">
+                                            {% if (errors.has('name')) %}<span class="help-block"> {{ errors.first('name') }} </span>{% endif %}
+                                        </div>
+                                    </div>
+                              </div>
+                              <!-- END NAME -->
+
+                              <!-- EMAIL -->
+                              <div class="form-group {% if (errors.has('email')) %}has-error{% endif %}">
+                                  <label class="control-label col-md-2">Email
+                                      <span class="required"> * </span>
+                                  </label>
+                                    <div class="col-md-6">
+                                        <div class="input-icon right">
+                                            <i class="fa fa-envelope"></i>
+                                            <input type="text" class="form-control" id="email" name="email" placeholder="email" autocomplete="off" readonly="readonly" value="{% if state == 'add' %}{{ old('email') }}{% else %}{{ Customer.email }}{% endif %}">
+                                            {% if (errors.has('email')) %}<span class="help-block"> {{ errors.first('email') }} </span>{% endif %}
+                                        </div>
+                                    </div>
+                              </div>
+                              <!-- END EMAIL -->
+
+
+                              <!-- ADDRESS -->
+                              <div class="form-group {% if (errors.has('address')) %}has-error{% endif %}">
+                                      <label class="control-label col-md-2">Address
+                                          <span class="required"> * </span>
+                                      </label>
+                                  <div class="col-md-6">
+                                        <div class="input-icon right">
+                                            <textarea class="form-control wysihtml5" id="address" name="address" rows="6">{% if state == 'add' %}{{ old('address') }}{% else %}{{ Customer.address }}{% endif %}</textarea>
+                                            {% if (errors.has('address')) %}<span class="help-block"> {{ errors.first('address') }} </span>{% endif %}
+                                        </div>
+                                 </div>
+                              </div>
+                              <!-- END ADDRESS -->
+
+                              <!-- PHONE -->
+                              <div class="form-group {% if (errors.has('phone')) %}has-error{% endif %}">
+                                  <label class="control-label col-md-2">Phone
+                                      <span class="required"> * </span>
+                                  </label>
+                                    <div class="col-md-6">
+                                        <div class="input-icon right">
+                                            <i class="fa fa-phone"></i>
+                                            <input type="text" class="form-control" id="phone" name="phone" autocomplete="off" value="{% if state == 'add' %}{{ old('phone') }}{% else %}{{ Customer.phone }}{% endif %}">
+                                            {% if (errors.has('phone')) %}<span class="help-block"> {{ errors.first('phone') }} </span>{% endif %}
+                                        </div>
+                                    </div>
+                              </div>
+                              <!-- END PHONE -->
+
+                              <hr>
+                          </div>
+                          <div class="form-actions">
+                              <div class="row">
+                                  <div class="col-md-offset-2 col-md-9">
+                                      <input type="hidden" class="form-control" id="id" name="id" value="{{ Customer.id }}" />
+                                    <button type="submit" class="btn btn-success">Save</button>
+                                  </div>
+                              </div>
+                          </div>
+                      </form>
+                      <!-- END FORM-->
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block addjs %}
+<!-- DROPDOWN -->
+{{ asset('plugins/select2/js/select2.full.min.js') | script_tag }}
+<!-- JS SELECT2 -->
+{{ asset('js/select2/select2.js') | script_tag }}
+
+<!-- DATEPICKER -->
+{{ asset('plugins/moment.min.js') | script_tag }}
+{{ asset('plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') | script_tag }}
+{{ asset('plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js') | script_tag }}
+
+<!-- JS DATEPICKER -->
+{{ asset('js/datetimepicker/datetime_picker.js') | script_tag }}
+
+
+<!-- WYSI -->
+{{ asset('plugins/bootstrap-wysihtml5/wysihtml5-0.3.0.js') | script_tag }}
+{{ asset('plugins/bootstrap-wysihtml5/bootstrap-wysihtml5.js') | script_tag }}
+
+<!-- JS INPUT EDITOR -->
+{{ asset('js/text-editor/text-editor.js') | script_tag }}
+
+<!-- VALIDATION -->
+{{ asset('plugins/jquery-validation/js/jquery.validate.min.js')|script_tag }}
+{{ asset('plugins/jquery-validation/js/additional-methods.min.js')|script_tag }}
+{{ asset('modules/user/profile/validate.js') | script_tag }}
+
+
+{% endblock %}

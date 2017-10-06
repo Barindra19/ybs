@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<!-- BEGIN HEAD -->
+
+<head>
+    {% block metadata %}
+        {% include "admin::partials/metadata" %}
+    {% endblock %}
+
+    {% block css_assets %}
+        {% include "admin::partials/css_assets" %}
+    {% endblock %}
+
+    {% block addcss %}
+
+    {% endblock %}
+
+</head>
+<!-- END HEAD -->
+
+
+
+<body>
+    {% block body %}
+
+    {% endblock %}
+
+
+
+
+
+
+{% block js_assets %}
+    {% include "admin::partials/js_assets" %}
+{% endblock %}
+
+{% block addjs %}
+
+{% endblock %}
+
+
+</body>
+</html>

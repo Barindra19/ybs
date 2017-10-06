@@ -1,0 +1,205 @@
+{% extends "admin::layouts.layout" %}
+
+{% block addcss %}
+{{ asset('plugins/icheck/skins/all.css')|css_tag }}
+{{ asset('plugins/select2/css/select2.min.css')|css_tag }}
+{{ asset('plugins/select2/css/select2-bootstrap.min.css')|css_tag }}
+{% endblock %}
+
+{% block pageheader %}
+<!-- BEGIN PAGE HEAD-->
+<div class="page-head">
+    <div class="container">
+        <!-- BEGIN PAGE TITLE -->
+        <div class="page-title">
+            <h1>{{ string_menuname }}
+                <small>Form {{ string_menuname }}</small>
+            </h1>
+        </div>
+        <!-- END PAGE TITLE -->
+    </div>
+</div>
+<!-- END PAGE HEAD-->
+
+{% endblock %}
+
+
+{% block breadcrumbs %}
+<!-- BEGIN PAGE BREADCRUMBS -->
+<ul class="page-breadcrumb breadcrumb">
+    <li>
+        <a href="{{ url('/home') }}">Home</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <a href="javascript:void(0)">Admin</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <a href="{{ route('menu_show') }}">{{ string_menuname }}</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <span>Form</span>
+    </li>
+</ul>
+<!-- END PAGE BREADCRUMBS -->
+{% endblock %}
+
+{% block body %}
+
+<div class="row">
+  <div class="col-md-12">
+      <!-- BEGIN VALIDATION STATES-->
+      <div class="portlet light portlet-fit portlet-form bordered">
+          <div class="portlet-title">
+              <div class="caption">
+                  <i class="glyphicon glyphicon-file font-green"></i>
+                  <span class="caption-subject font-green bold uppercase">Form {{ string_menuname }}</span>
+              </div>
+          </div>
+          <div class="portlet-body">
+              <!-- BEGIN FORM-->
+              <form action="{% if state == "add" %}{{ route('treatmentpackage_post') }}{% else %}{{ route('treatmentpackage_update') }}{% endif %}" name="form_treatmentpackage" id="form_treatmentpackage" class="form-horizontal" method="post">
+                  {{ csrf_field() }}
+                  <div class="form-body">
+                      <!-- NAME  -->
+                    <div class="form-group {% if (errors.has('name')) %}has-error{% endif %}">
+                        <label class="control-label col-md-3">Name {{ string_menuname }}
+                            <span class="required"> * </span>
+                        </label>
+                        <div class="col-md-6">
+                          <div class="input-icon right">
+                              <i class="fa fa-user"></i>
+                              <input type="text" class="form-control" id="name" name="name" placeholder="Name" autocomplete="off" value="{% if state == 'add' %}{{ old('name') }}{% else %}{{ TreatmentPackage.name }}{% endif %}">
+                              {% if (errors.has('name')) %}<span class="help-block"> {{ errors.first('name') }} </span>{% endif %}
+                          </div>
+                           </div>
+                    </div>
+                    <!-- END NAME  -->
+
+                    <!-- DESCRIPTION -->
+                    <div class="form-group {% if (errors.has('description')) %}has-error{% endif %}">
+                            <label class="control-label col-md-3">Description
+                            </label>
+                        <div class="col-md-6">
+                              <div class="input-icon right">
+                                  <i class="fa fa-info"></i>
+                                  <textarea class="form-control" id="description" name="description" placeholder="My Description Treatment">{% if state == 'add' %}{{ old('description') }}{% else %}{{ TreatmentPackage.description }}{% endif %}</textarea>
+                                  {% if (errors.has('description')) %}<span class="help-block"> {{ errors.first('address') }} </span>{% endif %}
+                              </div>
+                       </div>
+                    </div>
+                    <!-- END DESCRIPTION -->
+
+                    <!-- TREATMENT -->
+                        <div class="form-group {% if (errors.has('treatment')) %}has-error{% endif %}">
+                            <label class="control-label col-md-3">Treatment
+                                <span class="required"> * </span>
+                            </label>
+                            <div class="col-md-6">
+                                <div class="input-icon right">
+                                    <i class="fa"></i>
+                                    <select name="treatment" class="form-control select2me" id="treatment">
+                                        {% set ListTreatment = call_helpers('get_ListTreatment') %}
+                                        {% for key,value in ListTreatment %}
+                                            <option value="{{ key }}" {{ TreatmentPackage.treatment_id == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    {% if (errors.has('treatment')) %}<span class="help-block"> {{ errors.first('treatment') }} </span>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    <!-- END TREATMENT -->
+
+                    <!-- CATEGORY -->
+                        <div class="form-group {% if (errors.has('category')) %}has-error{% endif %}">
+                            <label class="control-label col-md-3">Treatment Category
+                                <span class="required"> * </span>
+                            </label>
+                            <div class="col-md-6">
+                                <div class="input-icon right">
+                                    <i class="fa"></i>
+                                    <select name="treatmentcategory" class="form-control select2me" id="treatmentcategory">
+                                        {% set ListTreatmentCategory = call_helpers('get_ListTreatmentCategory',TreatmentPackage.treatment_id) %}
+                                        {% for key,value in ListTreatmentCategory %}
+                                            <option value="{{ key }}" {{ TreatmentPackage.treatment_category_id == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <p id="retrieve">&nbsp;</p>
+                                    {% if (errors.has('category')) %}<span class="help-block"> {{ errors.first('category') }} </span>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    <!-- END CATEGORY -->
+
+
+
+                <!-- PRICE  -->
+                  <div class="form-group {% if (errors.has('name')) %}has-error{% endif %}">
+                      <label class="control-label col-md-3">Price
+                          <span class="required"> * </span>
+                      </label>
+                      <div class="col-md-6">
+                        <div class="input-icon right">
+                            <i class="fa ">Rp</i>
+                            <input type="text" class="form-control rupiah" id="price" name="price" placeholder="Price" autocomplete="off" value="{% if state == 'add' %}{{ old('price') }}{% else %}{{ TreatmentPackage.price }}{% endif %}">
+                            {% if (errors.has('price')) %}<span class="help-block"> {{ errors.first('price') }} </span>{% endif %}
+                        </div>
+                         </div>
+                  </div>
+                  <!-- END PRICE  -->
+
+
+                      <!-- POINT  -->
+                      <div class="form-group {% if (errors.has('point')) %}has-error{% endif %}">
+                          <label class="control-label col-md-3">Point
+                              <span class="required"> * </span>
+                          </label>
+                          <div class="col-md-6">
+                                  <input type="text" class="form-control number" id="point" name="point" placeholder="0" autocomplete="off" value="{% if state == 'add' %}{% if  old('point') == 0 %}0{% else %}{{ old('point') }} {% endif %}{% else %}{{ TreatmentPackage.point }}{% endif %}">
+                                  {% if (errors.has('point')) %}<span class="help-block"> {{ errors.first('point') }} </span>{% endif %}
+                          </div>
+                      </div>
+                      <!-- END POINT  -->
+
+                  </div>
+                  <div class="form-actions">
+                      <div class="row">
+                          <div class="col-md-offset-3 col-md-9">
+                              <input type="hidden" class="form-control" id="id" name="id" value="{{ id }}" />
+                              <input type="hidden" class="form-control" id="treatmentcategorybackup" name="treatmentcategory" value="0" disabled="true"/>
+                            <a  class="btn btn-default" href="{{ route('treatmentpackage_show') }}">Batal</a>
+                            <button type="submit" class="btn btn-success">Simpan</button>
+                          </div>
+                      </div>
+                  </div>
+              </form>
+              <!-- END FORM-->
+          </div>
+          <!-- END VALIDATION STATES-->
+      </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block addjs %}
+<!-- DROPDOWN -->
+{{ asset('plugins/select2/js/select2.full.min.js')|script_tag }}
+
+<!-- VALIDATION -->
+{{ asset('plugins/jquery-validation/js/jquery.validate.min.js')|script_tag }}
+{{ asset('plugins/jquery-validation/js/additional-methods.min.js')|script_tag }}
+{{ asset('modules/treatmentpackage/validate.js')|script_tag }}
+
+<!-- INPUT-MASK BUNDLE-->
+{{ asset('plugins/jquery-inputmask/jquery.inputmask.bundle.min.js')|script_tag }}
+<!-- JS INPUT-MASK -->
+{{ asset('js/input-mask/input-mask.js')|script_tag }}
+
+<!-- JS -->
+{{ asset('modules/treatmentpackage/main.js')|script_tag }}
+{% endblock %}

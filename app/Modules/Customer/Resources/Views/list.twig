@@ -1,0 +1,142 @@
+{% extends "admin::layouts.layout_blank" %}
+
+{% block addcss %}
+{{ asset('plugins/datatables/datatables.min.css')|css_tag }}
+{{ asset('plugins/datatables/plugins/bootstrap/datatables.bootstrap.css')|css_tag }}
+{% endblock %}
+
+
+{% block pageheader %}
+<!-- BEGIN PAGE HEAD-->
+<div class="page-head">
+    <div class="container">
+        <!-- BEGIN PAGE TITLE -->
+        <div class="page-title">
+            <h1>{{ string_menuname }}
+                <small>List {{ string_menuname }}</small>
+            </h1>
+        </div>
+        <!-- END PAGE TITLE -->
+    </div>
+</div>
+<!-- END PAGE HEAD-->
+
+{% endblock %}
+
+
+{% block breadcrumbs %}
+<!-- BEGIN PAGE BREADCRUMBS -->
+<ul class="page-breadcrumb breadcrumb">
+    <li>
+        <a href="{{ url('/home') }}">Home</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <a href="javascript:void(0)">Customer</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <span>{{ string_menuname }}</span>
+    </li>
+</ul>
+<!-- END PAGE BREADCRUMBS -->
+{% endblock %}
+
+
+{% block body %}
+<div class="row">
+    <div class="col-md-12">
+        <!-- BEGIN EXAMPLE TABLE PORTLET-->
+          <div class="portlet light">
+              <div class="portlet-title">
+                  <div class="caption">
+                      <i class="fa fa-cog font-yellow-casablanca"></i>
+                      <span class="caption-subject bold font-yellow-casablanca uppercase"> {{ string_active_menu }} {{ string_menuname }} </span>
+                      <span class="caption-helper">List {{ string_menuname }} {{ config_get('app.name') }}</span>
+                  </div>
+                  <div class="inputs">
+                 </div>
+              </div>
+              <div class="portlet-body">
+                  {% if(session('scsMsg')) %}
+                      <div class="alert alert-success">
+                          <button class="close" data-close="alert"></button>
+                          <span>{{ session('scsMsg') }}</span>
+                      </div>
+                  {% endif %}
+
+                  {% if errors.any %}
+                      {% for error in errors.all %}
+                          <div class="alert alert-danger">
+                              <button class="close" data-close="alert"></button>
+                              <span>
+                                  {{ error }}
+                              </span>
+                          </div>
+                      {% endfor %}
+                  {% endif %}
+
+                        <table class="table table-hover table-light" id="tbl_customerall">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Branch</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <!--tbody section is required-->
+                            <tbody></tbody>
+                        </table>
+              </div>
+          </div>
+          <!-- END EXAMPLE TABLE PORTLET-->
+    </div>
+</div>
+{% endblock %}
+
+{% block addmodal %}
+    <!-- Delete -->
+    <div class="modal fade bs-modal-sm" id="ConfirmDelete" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-danger">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Delete Confirmation!</h4>
+                </div>
+                <div class="modal-body">
+                    Are you sure??
+                    <input type="hidden" name="id" id="id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn dark btn-danger" data-dismiss="modal" onclick="ActionDelete()">Delete</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- Delete -->
+
+
+{% endblock %}
+
+{% block addjs %}
+{{ asset('plugins/datatables/datatables.min.js')|script_tag }}
+{{ asset('plugins/datatables/plugins/bootstrap/datatables.bootstrap.js')|script_tag }}
+
+<script>
+var ROUTE_DATATABLE         = '{{ route('customer_datatables') }}';
+var ROUTE_DATATABLE_LIST    = '{{ route('customerlist_datatables') }}';
+
+function GetData(id){
+    window.opener.getDataParet(id);
+    window.close();
+}
+
+</script>
+{{ asset('modules/customer/datatable.js')|script_tag }}
+{% endblock %}

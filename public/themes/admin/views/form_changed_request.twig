@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<!-- BEGIN HEAD -->
+
+<head>
+    {% block metadata %}
+        {% include "admin::partials/metadata" %}
+    {% endblock %}
+    <!-- BEGIN GLOBAL MANDATORY STYLES -->
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css" />
+    {{ asset('plugins/font-awesome/css/font-awesome.min.css')|css_tag }}
+    {{ asset('plugins/simple-line-icons/simple-line-icons.min.css')|css_tag }}
+    {{ asset('plugins/bootstrap/css/bootstrap.min.css')|css_tag }}
+    {{ asset('plugins/bootstrap-switch/css/bootstrap-switch.min.css')|css_tag }}
+    {{ asset('plugins/font-awesome/css/font-awesome.min.css')|css_tag }}
+
+    <!-- END GLOBAL MANDATORY STYLES -->
+    <!-- BEGIN THEME GLOBAL STYLES -->
+    {{ theme_asset('admin::css/components.css')|css_tag }}
+    {{ theme_asset('admin::css/plugins.css')|css_tag }}
+    <!-- END THEME GLOBAL STYLES -->
+    <!-- BEGIN PAGE LEVEL STYLES -->
+    {{ theme_asset('admin::css/pages/login-2.min.css')|css_tag }}
+    <!-- END PAGE LEVEL STYLES -->
+    <!-- BEGIN THEME LAYOUT STYLES -->
+    <!-- END THEME LAYOUT STYLES -->
+    <link rel="shortcut icon" href="favicon.ico" /> </head>
+<!-- END HEAD -->
+
+<body class="login">
+<!-- BEGIN LOGO -->
+<div class="logo" style="margin-top: 30px;">
+    <img src="{{ theme_asset('img/yourbag.png') }}" class="logo-default" style="height:100px;width:150px;" alt="{{ theme_asset('img/yourbag.png') }}" />
+    
+    <!-- <img src="{base_url()}media/logo/{$Settings->file}" class="logo-default" alt="{$Settings->header_name}" style="width:100px;height:80px;" /> </a> -->
+</div>
+<!-- END LOGO -->
+<!-- BEGIN LOGIN -->
+
+<!-- BEGIN LOGIN -->
+<div class="content">
+    <!-- BEGIN LOGIN FORM -->
+    <form class="login-form" action="{{ route('password_request_act') }}" method="post">
+        {{ csrf_field() }}
+
+        <div class="form-title">
+            <span class="form-title">Changed Password...</span>
+        </div>
+        {% if(session('scsMsg')) %}
+            <div class="alert alert-success">
+                <button class="close" data-close="alert"></button>
+                <span>{{ session('scsMsg') }}</span>
+            </div>
+        {% endif %}
+        {% if(session('failMsg')) %}
+            <div class="alert alert-danger">
+                <button class="close" data-close="alert"></button>
+                <span>{{ session('failMsg') }}</span>
+            </div>
+        {% endif %}
+
+
+        {% if errors.any %}
+            {% for error in errors.all %}
+                <div class="alert alert-danger">
+                    <button class="close" data-close="alert"></button>
+                    <span>{{ error }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="form-group">
+            <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
+            <label class="control-label visible-ie8 visible-ie9">Password</label>
+            <input class="form-control form-control-solid placeholder-no-fix" type="password" autocomplete="off" placeholder="password" name="password" id="password" required autofocus/>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label visible-ie8 visible-ie9">Re-type Password</label>
+            <input class="form-control form-control-solid placeholder-no-fix" type="password" autocomplete="off" placeholder="Re-type" name="password_confirmation" id="password_confirmation"/>
+        </div>
+
+        <div class="form-actions">
+            <input type="hidden" name="email" value="{{ Users.email }}">
+            <input type="hidden" name="user_id" value="{{ id }}">
+            <button type="submit" class="btn red btn-block uppercase">Submit</button>
+        </div>
+    </form>
+    <!-- END LOGIN FORM -->
+</div>
+
+
+
+<div class="copyright hide"> 2016 © {{ config('app.name')}}</div>
+
+
+
+
+
+
+<!--[if lt IE 9]>
+{{ asset('plugins/respon.min.js')|script_tag }}
+{{ asset('plugins/excanvas.min.js')|script_tag }}
+{{ asset('plugins/ie8.fix.min.js')|script_tag }}
+<![endif]-->
+
+<!-- BEGIN CORE PLUGINS -->
+{{ asset('plugins/jquery.min.js')|script_tag }}
+{{ asset('plugins/bootstrap/js/bootstrap.min.js')|script_tag }}
+{{ asset('plugins/js.cookie.min.js')|script_tag }}
+{{ asset('plugins/jquery-slimscroll/jquery.slimscroll.min.js')|script_tag }}
+{{ asset('plugins/jquery.blockui.min.js')|script_tag }}
+{{ asset('plugins/bootstrap-switch/js/bootstrap-switch.min.js')|script_tag }}
+<!-- END CORE PLUGINS -->
+<!-- BEGIN PAGE LEVEL PLUGINS -->
+{{ asset('plugins/jquery-validation/js/jquery.validate.min.js')|script_tag }}
+{{ asset('plugins/jquery-validation/js/additional-methods.min.js')|script_tag }}
+{{ asset('plugins/select2/js/select2.full.min.js')|script_tag }}
+<!-- END PAGE LEVEL PLUGINS -->
+<!-- BEGIN THEME GLOBAL SCRIPTS -->
+{{ theme_asset('admin::js/app.min.js')|script_tag }}
+<!-- {{ theme_asset('plugins/backstretch/jquery.backstretch.min.js') }} -->
+<!-- END THEME GLOBAL SCRIPTS -->
+<!-- BEGIN PAGE LEVEL SCRIPTS -->
+{{ theme_asset('admin::js/app.min.js')|script_tag }}
+{{ theme_asset('admin::js/pages/login.min.js')|script_tag }}
+<!-- END PAGE LEVEL SCRIPTS -->
+<!-- BEGIN THEME LAYOUT SCRIPTS -->
+<!-- END THEME LAYOUT SCRIPTS -->
+</body>
+
+</html>

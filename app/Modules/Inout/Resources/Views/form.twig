@@ -1,0 +1,295 @@
+{% extends "admin::layouts.layout" %}
+
+{% block addcss %}
+{{ asset('plugins/icheck/skins/all.css')|css_tag }}
+{{ asset('plugins/select2/css/select2.min.css')|css_tag }}
+{{ asset('plugins/select2/css/select2-bootstrap.min.css')|css_tag }}
+
+<!-- NOTIFICATION -->
+{{ asset('plugins/bootstrap-toastr/toastr.min.css')| css_tag }}
+
+<!-- DROPDOWN -->
+{{ asset('plugins/select2/css/select2.min.css')| css_tag }}
+{{ asset('plugins/select2/css/select2-bootstrap.min.css')| css_tag }}
+
+<!-- DATEPICKER  -->
+{{ asset('plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css')|css_tag }}
+
+{% endblock %}
+
+{% block pageheader %}
+<!-- BEGIN PAGE HEAD-->
+<div class="page-head">
+    <div class="container">
+        <!-- BEGIN PAGE TITLE -->
+        <div class="page-title">
+            <h1>{{ string_menuname }}
+                <small>Form {{ string_menuname }}</small>
+            </h1>
+        </div>
+        <!-- END PAGE TITLE -->
+    </div>
+</div>
+<!-- END PAGE HEAD-->
+
+{% endblock %}
+
+
+{% block breadcrumbs %}
+<!-- BEGIN PAGE BREADCRUMBS -->
+<ul class="page-breadcrumb breadcrumb">
+    <li>
+        <a href="{{ url('/home') }}">Home</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <a href="javascript:void(0)">Admin</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <a href="{{ route('menu_show') }}">{{ string_menuname }}</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <span>Form</span>
+    </li>
+</ul>
+<!-- END PAGE BREADCRUMBS -->
+{% endblock %}
+
+{% block body %}
+
+<div class="row">
+  <div class="col-md-12">
+      <!-- BEGIN VALIDATION STATES-->
+      <div class="portlet light portlet-fit portlet-form bordered">
+          <div class="portlet-title">
+              <div class="caption">
+                  <i class="glyphicon glyphicon-file font-green"></i>
+                  <span class="caption-subject font-green bold uppercase">Form {{ string_menuname }}</span>
+              </div>
+          </div>
+          <div class="portlet-body">
+              {% if(session('ScsMsg')) %}
+                  <div class="alert alert-success">
+                      <button class="close" data-close="alert"></button>
+                      <span>{{ session('ScsMsg') }}</span>
+                  </div>
+              {% endif %}
+
+              {% if(session('ErrMsg')) %}
+                  <div class="alert alert-danger">
+                      <button class="close" data-close="alert"></button>
+                      <span>{{ session('ErrMsg') }}</span>
+                  </div>
+              {% endif %}
+
+              {% if(session('WrngMsg')) %}
+                  <div class="alert alert-warning">
+                      <button class="close" data-close="alert"></button>
+                      <span>{{ session('WrngMsg') }}</span>
+                  </div>
+              {% endif %}
+
+              <!-- BEGIN FORM-->
+              <form action="{% if state == "add" %}{{ route('inout_post') }}{% else %}{{ route('inout_update') }}{% endif %}" name="form_inout" id="form_inout" class="form-horizontal" method="post">
+                  {{ csrf_field() }}
+                  <div class="form-body">
+
+                      <!-- PARAM -->
+                      <input type="hidden" class="form-control" id="id" name="id" value="{{ Inout.id }}" />
+                      <!-- END PARAM -->
+
+
+                      <!-- NAME  -->
+                    <div class="form-group {% if (errors.has('name')) %}has-error{% endif %}">
+                        <label class="control-label col-md-3">Kebutuhan
+                            <span class="required"> * </span>
+                        </label>
+                        <div class="col-md-6">
+                          <div class="input-icon right">
+                              <i class="fa fa-user"></i>
+                              <input type="text" class="form-control" id="name" name="name" placeholder="Name" autocomplete="off" value="{% if state == 'add' %}{{ old('name') }}{% else %}{{ Inout.name }}{% endif %}">
+                              {% if (errors.has('name')) %}<span class="help-block"> {{ errors.first('name') }} </span>{% endif %}
+                          </div>
+                           </div>
+                    </div>
+                    <!-- END NAME  -->
+
+
+                      <!-- FLOW -->
+                      <div class="form-group">
+                          <label class="control-label col-md-3">Jenis Transaksi
+                              <span class="required"> * </span>
+                          </label>
+                          <div class="col-md-6">
+                              <select class="form-control select2" name="flow" id="flow">
+                                  {% set ListJenisTransaksi = call_helpers('get_jenisTransaksi') %}
+                                  {% if (state == 'add') %}
+                                      {% for key,value in ListJenisTransaksi %}
+                                          <option value="{{ key }}" {{  key == "I" ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                      {% endfor %}
+                                  {% else %}
+                                      {% for key,value in ListJenisTransaksi %}
+                                          <option value="{{ key }}" {{ Flow == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                      {% endfor %}
+                                  {% endif %}
+                              </select>
+                          </div>
+                      </div>
+                      <!-- END FLOW -->
+
+                      <!-- ACCOUNT -->
+                      <div class="form-group">
+                          <label class="control-label col-md-3">Account
+                              <span class="required"> * </span>
+                          </label>
+                          <div class="col-md-6">
+                              <select class="form-control select2" name="account" id="account">
+                                  {% if (state == 'add') %}
+                                      {% set ListAccountList = call_helpers('get_AccountList', "I") %}
+                                      {% for key,value in ListAccountList %}
+                                          <option value="{{ key }}" {{ old('account') == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                      {% endfor %}
+                                  {% else %}
+                                      {% set ListAccountList = call_helpers('get_AccountList',Flow) %}
+                                      {% for key,value in ListAccountList %}
+                                          <option value="{{ key }}" {{ Inout.account_id == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                      {% endfor %}
+                                  {% endif %}
+                              </select>
+                          </div>
+                      </div>
+                      <!-- END ACCOUNT -->
+
+                      <!-- TOTAL  -->
+                      <div class="form-group {% if (errors.has('total')) %}has-error{% endif %}">
+                          <label class="control-label col-md-3">Total
+                              <span class="required"> * </span>
+                          </label>
+                          <div class="col-md-4">
+                              <div class="input-icon right">
+                                  <i class="fa fa-money"></i>
+                                  <input type="text" class="form-control rupiah" id="total" name="total" placeholder="Rp 0,-" autocomplete="off" value="{% if state == 'add' %}{{ old('total') }}{% else %}{{ Inout.total }}{% endif %}">
+                                  {% if (errors.has('total')) %}<span class="help-block"> {{ errors.first('total') }} </span>{% endif %}
+                              </div>
+                          </div>
+                      </div>
+                      <!-- END TOTAL  -->
+
+
+                      <!-- DATE  -->
+                      <div class="form-group {% if (errors.has('date_transaction')) %}has-error{% endif %}">
+                          <label class="control-label col-md-3">Tanggal
+                              <span class="required"> * </span>
+                          </label>
+                          <div class="col-md-4">
+                              <div class="input-icon right">
+                                  <i class="fa fa-calendar"></i>
+                                  <input type="text" class="form-control date-picker" data-date-format="dd-mm-yyyy" id="date_transaction" name="date_transaction" placeholder="dd-mm-yyyy" autocomplete="off" value="{% if state == 'add' %}{{ date_transaction }}{% else %}{{ date_transaction }}{% endif %}">
+                                  {% if (errors.has('date_transaction')) %}<span class="help-block"> {{ errors.first('date_transaction') }} </span>{% endif %}
+                              </div>
+                          </div>
+                      </div>
+                      <!-- END DATE  -->
+
+                      <!-- PAYMENT TYPE -->
+                      <div class="form-group {% if (errors.has('payment_type')) %}has-error{% endif %}">
+                          <label class="control-label col-md-3">Metode
+                              <span class="required"> * </span>
+                          </label>
+                          <div class="col-md-5">
+                              <div class="input-icon right">
+                                  <i class="fa"></i>
+                                  <select name="payment_type" class="form-control select2" id="payment_type">
+                                      {% set ListPaymentType = call_helpers('get_PaymentType') %}
+                                      {% for key,value in ListPaymentType %}
+                                          <option value="{{ key }}" {{ Inout.payment_type_id == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                      {% endfor %}
+                                  </select>
+                                  <span class="help-block required"> Note : Mohon pilih metode diatas.</span>
+                                  {% if (errors.has('payment_type')) %}<span class="help-block"> {{ errors.first('payment_type') }} </span>{% endif %}
+                              </div>
+                          </div>
+                      </div>
+                      <!-- END PAYMENT TYPE -->
+
+                      {% if call_helpers('bool_CheckAccessUser','access-pusat') %}
+                          <!-- BRANCH -->
+                          <div class="form-group {% if (errors.has('branch')) %}has-error{% endif %}">
+                              <label class="control-label col-md-3">Branch
+                                  <span class="required"> * </span>
+                              </label>
+                              <div class="col-md-4">
+                                  <div class="input-icon right">
+                                      <i class="fa"></i>
+                                      <select name="branch" class="form-control select2" id="branch">
+                                          {% set ListBranch = call_helpers('get_ListBranch') %}
+                                          {% for key,value in ListBranch %}
+                                              <option value="{{ key }}" {{ BranchID == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                          {% endfor %}
+                                      </select>
+                                      {% if (errors.has('branch')) %}<span class="help-block"> {{ errors.first('branch') }} </span>{% endif %}
+                                  </div>
+                              </div>
+                          </div>
+                          <!-- END BRANCH -->
+                      {% endif %}
+
+                  </div>
+                  <div class="form-actions">
+                      <div class="row">
+                          <div class="col-md-offset-3 col-md-9">
+                            <a  class="btn btn-default" href="{{ route('inout_show') }}">Batal</a>
+                            <button type="submit" class="btn btn-success">Simpan</button>
+                          </div>
+                      </div>
+                  </div>
+              </form>
+              <!-- END FORM-->
+          </div>
+          <!-- END VALIDATION STATES-->
+      </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block addjs %}
+
+<!-- VALIDATION -->
+{{ asset('plugins/jquery-validation/js/jquery.validate.min.js')|script_tag }}
+{{ asset('plugins/jquery-validation/js/additional-methods.min.js')|script_tag }}
+{{ asset('modules/inout/validate.js')|script_tag }}
+
+{{ asset('modules/inout/main.js')|script_tag }}
+
+
+<!-- NOTIFICATION -->
+{{ asset('plugins/bootstrap-toastr/toastr.min.js')|script_tag }}
+
+<!-- DROPDOWN -->
+{{ asset('plugins/select2/js/select2.full.min.js')|script_tag }}
+
+<!-- JS SELECT2 -->
+{{ asset('js/select2/select2.js')|script_tag }}
+
+<!-- INPUT-MASK BUNDLE-->
+{{ asset('plugins/jquery-inputmask/jquery.inputmask.bundle.min.js')|script_tag }}
+
+<!-- JS INPUT-MASK -->
+{{ asset('js/input-mask/input-mask.js')|script_tag }}
+
+<!-- DATEPICKER -->
+{{ asset('plugins/moment.min.js')|script_tag }}
+{{ asset('plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js')|script_tag }}
+{{ asset('plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js')|script_tag }}
+
+
+<!-- JS DATEPICKER -->
+{{ asset('js/datetimepicker/datetime_picker.js')|script_tag }}
+
+
+{% endblock %}

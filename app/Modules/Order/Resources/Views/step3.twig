@@ -1,0 +1,282 @@
+{% extends "admin::layouts.layout" %}
+
+{% block addcss %}
+{{ asset('plugins/icheck/skins/all.css')|css_tag }}
+{{ asset('plugins/select2/css/select2.min.css')|css_tag }}
+{{ asset('plugins/select2/css/select2-bootstrap.min.css')|css_tag }}
+
+{{ asset('plugins/bootstrap-fileinput/bootstrap-fileinput.css') | css_tag }}
+
+{% endblock %}
+
+{% block pageheader %}
+<!-- BEGIN PAGE HEAD-->
+<div class="page-head">
+    <div class="container">
+        <!-- BEGIN PAGE TITLE -->
+        <div class="page-title">
+            <h1>{{ string_menuname }}
+                <small>Form {{ string_menuname }}</small>
+            </h1>
+        </div>
+        <!-- END PAGE TITLE -->
+    </div>
+</div>
+<!-- END PAGE HEAD-->
+
+{% endblock %}
+
+
+{% block breadcrumbs %}
+<!-- BEGIN PAGE BREADCRUMBS -->
+<ul class="page-breadcrumb breadcrumb">
+    <li>
+        <a href="{{ url('/home') }}">Home</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <a href="javascript:void(0)">Order</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        New {{ string_menuname }}
+    </li>
+</ul>
+<!-- END PAGE BREADCRUMBS -->
+{% endblock %}
+
+{% block body %}
+<div class="col-md-12">
+    {% if (session('errMsg')) %}
+        <div class="alert alert-danger">
+            <button class="close" data-close="alert"></button>
+            <span>{{ session('errMsg') }}</span>
+        </div>
+    {% endif %}
+
+    <div class="portlet light portlet-fit ">
+        <div class="portlet-body">
+            <div class="mt-element-step">
+                <div class="row step-line">
+                    <div class="mt-step-desc">
+                        <div class="col-md-3 mt-step-col first done">
+                            <div class="mt-step-number bg-white">1</div>
+                            <div class="mt-step-title uppercase font-grey-cascade">Step 1</div>
+                            <div class="mt-step-content font-grey-cascade">Order Informasi</div>
+                        </div>
+                        <div class="col-md-3 mt-step-col done">
+                            <div class="mt-step-number bg-white font-grey">2</div>
+                            <div class="mt-step-title uppercase font-grey-cascade">Step 2</div>
+                            <div class="mt-step-content font-grey-cascade">Lengkapi Detail Order</div>
+                        </div>
+                        <div class="col-md-3 mt-step-col error">
+                            <div class="mt-step-number bg-white font-grey">3</div>
+                            <div class="mt-step-title uppercase font-grey-cascade">Step 3</div>
+                            <div class="mt-step-content font-grey-cascade">Upload Image</div>
+                        </div>
+                        <div class="col-md-3 mt-step-col last">
+                            <div class="mt-step-number bg-white font-grey">4</div>
+                            <div class="mt-step-title uppercase font-grey-cascade">Step 4</div>
+                            <div class="mt-step-content font-grey-cascade">Confirm & Finish</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+      <div class="portlet light ">
+          <div class="portlet-title">
+              <div class="caption">
+                  <i class="fa fa-check font-red"></i>
+                  <span class="caption-subject font-red sbold uppercase">Upload Image [{{ Order.ref_number }}]</span>
+              </div>
+              <div class="actions">
+              </div>
+          </div>
+          <div class="portlet-body">
+              <div class="table-scrollable">
+                  <table class="table table-hover table-light" id="order_detail">
+                      <thead>
+                          <tr>
+                              <th> Treatment </th>
+                              <th> Merk </th>
+                              <th> Category </th>
+                              <th> Package </th>
+                              <th> Image </th>
+                              <th> </th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {%  for item in OrderDetail %}
+                          <tr id="row{{ item.id}}">
+                              <td>  {{ item.treatment.name }} </td>
+                              <td> {{ item.merk.name }} </td>
+                              {% if item.treatment_category_id %}
+                              <td> {{ item.treatmentcategory.name }} </td>
+                              {% else %}
+                              <td> - </td>
+                              {% endif %}
+                              <td> {{ item.treatment_package }}  </td>
+
+                              <td id="imageUpload{{ item.id }}">
+                                  {{ call_helpers('get_orderimage',item.id) }}
+                              </td>
+                              <td>
+                                  <a href="javascript:void(0)" class="btn btn-outline btn-circle red btn-sm black" onclick="Upload({{ item.id }})"><i class="fa fa-cloud-upload"></i> Upload </a>
+                             </td>
+                          </tr>
+                          {% endfor %}
+
+                      </tbody>
+                  </table>
+              </div>
+              <hr>
+                <form action="{{ route('order_save_step3') }}" name="form_step3" id="form_step3" class="form-horizontal" method="post">
+                  {{ csrf_field() }}
+                  <div class="form-actions">
+                      <div class="row">
+                          <div class="col-md-offset-3 col-md-9">
+                              <input type="hidden" class="form-control" name="id" value="{{ order_id }}" />
+                            <button type="submit" class="btn btn-success" name="btn" value="Next">Next Step</button>
+                          </div>
+                      </div>
+                  </div>
+                </form>
+          </div>
+      </div>
+      <!-- BEGIN VALIDATION STATES-->
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block addmodal %}
+
+    <!-- ADD DETAIL -->
+    <div class="modal fade in" id="AddUploadImage" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-full">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Upload Image - {{ Order.ref_number }}</h4>
+                </div>
+                <div class="modal-body">
+                    <!-- BEGIN FORM-->
+                        <div class="form-body">
+                            <!-- TREATMENT -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-warning">
+                                        <div class="col-md-3">
+                                          <input type="text" class="form-control" readonly id="treatment" name="treatment">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" readonly id="merk" name="merk">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" readonly id="category" name="category">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" readonly id="package" name="package">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  TREATMENT -->
+                            <br>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <form name="form_upload" id="form_upload" class="form-horizontal form-bordered" enctype="multipart/form-data" method="post">
+                                        {{ csrf_field() }}
+                                        <div class="form-body">
+                                            <div class="form-group">
+                                                <label class="control-label col-md-3"></label>
+                                                <div class="col-md-3">
+                                                    <input type="hidden" id="order_id" name="order_id" value="{{ order_id }}">
+                                                    <input type="hidden" id="order_detail_id" name="order_detail_id">
+                                                    <button type="button" class="btn btn-info mt-ladda-btn ladda-button btn-circle" id="btn-addMoreItem"><i class="fa fa-plus"></i> Add</button>
+                                                    <button type="submit" class="btn green mt-ladda-btn ladda-button btn-circle" id="btn-StartUpload"><i class="fa fa-cloud-upload"></i> Start Upload</button>
+                                                </div>
+                                            </div>
+                                            <div id="UploadImage">
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn dark btn-outline btn-circle" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- ADD DETAIL  -->
+
+    <!-- CONFIRM DELETE -->
+    <div class="modal fade bs-modal-sm" id="ConfirmDelete" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-danger">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Delete Confirmation!</h4>
+                </div>
+                <div class="modal-body">
+                    Are you sure??
+                    <input type="hidden" id="id_delete" name="id_delete">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal" id="btn-DeleteRow">Delete</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- CONFIRM DELETE -->
+
+    <!-- ERROR MESSAGE -->
+    <div class="modal fade bs-modal-sm" id="ShowErrMsg" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-danger">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Warning!</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="msgError"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- ERROR MESSAGE -->
+{% endblock %}
+
+
+
+{% block addjs %}
+<script>
+    var IMG_SPINNER = '{{ theme_asset('img/input-spinner.gif') }}';
+</script>
+
+{{ asset('plugins/bootstrap-fileinput/bootstrap-fileinput.js')|script_tag }}
+
+
+<!-- JS -->
+{{ asset('modules/order/main.js')|script_tag }}
+
+{% endblock %}

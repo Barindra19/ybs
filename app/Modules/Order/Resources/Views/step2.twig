@@ -1,0 +1,132 @@
+{% extends "admin::layouts.layout" %}
+
+{% block addcss %}
+{{ asset('plugins/icheck/skins/all.css')|css_tag }}
+{{ asset('plugins/select2/css/select2.min.css')|css_tag }}
+{{ asset('plugins/select2/css/select2-bootstrap.min.css')|css_tag }}
+
+{% endblock %}
+
+{% block pageheader %}
+<!-- BEGIN PAGE HEAD-->
+<div class="page-head">
+    <div class="container">
+        <!-- BEGIN PAGE TITLE -->
+        <div class="page-title">
+            <h1>{{ string_menuname }}
+                <small>Form {{ string_menuname }}</small>
+            </h1>
+        </div>
+        <!-- END PAGE TITLE -->
+    </div>
+</div>
+<!-- END PAGE HEAD-->
+
+{% endblock %}
+
+
+{% block breadcrumbs %}
+<!-- BEGIN PAGE BREADCRUMBS -->
+<ul class="page-breadcrumb breadcrumb">
+    <li>
+        <a href="{{ url('/home') }}">Home</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <a href="javascript:void(0)">Order</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        New {{ string_menuname }}
+    </li>
+</ul>
+<!-- END PAGE BREADCRUMBS -->
+{% endblock %}
+
+{% block body %}
+<div class="col-md-12">
+    {% if (session('errMsg')) %}
+        <div class="alert alert-danger">
+            <button class="close" data-close="alert"></button>
+            <span>{{ session('errMsg') }}</span>
+        </div>
+    {% endif %}
+
+
+    <button type="button" class="btn btn-transparent red btn-outline btn-circle btn-sm" href="javascript:void(0);" id="btn-Add"><i class="fa fa-plus-square"></i> Add</button>
+
+{% endblock %}
+
+{% block addmodal %}
+    <!-- ADD DETAIL -->
+    <div id="AddDetail" class="modal fade" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Select2 Demo In Modal</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="#" class="form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Basic</label>
+                            <div class="col-md-8">
+                                <select name="merk" class="form-control select2" id="merk">
+                                    {% set ListMerk = call_helpers('get_ListMerk') %}
+                                          {% for key,value in ListMerk %}
+                                              <option value="{{ key }}" {{ MerkID == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                          {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn dark btn-outline" data-dismiss="modal" aria-hidden="true">Close</button>
+                    <button class="btn green" data-dismiss="modal">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ADD DETAIL  -->
+
+{% endblock %}
+
+
+
+{% block addjs %}
+<script>
+    var IMG_SPINNER = '{{ theme_asset('img/input-spinner.gif') }}';
+</script>
+
+<!-- DATEPICKER -->
+{{ asset('plugins/moment.min.js')|script_tag }}
+{{ asset('plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js')|script_tag }}
+{{ asset('plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js')|script_tag }}
+
+
+<!-- VALIDATION -->
+{{ asset('plugins/jquery-validation/js/jquery.validate.min.js')|script_tag }}
+{{ asset('plugins/jquery-validation/js/additional-methods.min.js')|script_tag }}
+{{ asset('modules/order/validate.js')|script_tag }}
+
+
+<!-- DROPDOWN -->
+{{ asset('plugins/select2/js/select2.full.min.js')|script_tag }}
+
+<!-- INPUT-MASK BUNDLE-->
+{{ asset('plugins/jquery-inputmask/jquery.inputmask.bundle.min.js')|script_tag }}
+
+<!-- JS INPUT-MASK -->
+{{ asset('js/input-mask/input-mask.js')|script_tag }}
+
+<!-- JS DATEPICKER -->
+{{ asset('js/datetimepicker/datetime_picker.js')|script_tag }}
+<!-- JS SELECT2 -->
+{{ asset('js/select2/select2.js')|script_tag }}
+
+
+<!-- JS -->
+{{ asset('modules/order/main.js')|script_tag }}
+
+{% endblock %}

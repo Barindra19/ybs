@@ -1,0 +1,26 @@
+{% if not app.session.get('Menu') %}
+    {{ call_helpers('createMenu') }}
+{% endif %}
+
+{% for  Menu in app.session.get('Menu') %}
+<li aria-haspopup="true" class="menu-dropdown classic-menu-dropdown  {{ active_class_path(Menu.active_menu, 'active') }}">
+    <a href="{% if Menu.arrSubMenu %}javascript:void(0);{% else %}{% if Menu.url %}{{ url(Menu.url) }}{% endif %}{% endif %}">
+        <i class="{{ Menu.icon }}"></i>
+        {{ Menu.name }}
+        {% if Menu.arrSubMenu %}
+            <span class="arrow"></span>
+        {% endif %}
+    </a>
+    {% if Menu.arrSubMenu %}
+        <ul class="dropdown-menu pull-left">
+            {% for SubMenu in Menu.arrSubMenu %}
+            <li aria-haspopup="true" class=" active">
+                <a href="{{ url(SubMenu.url) }}" class="nav-link  {{ active_class_path(SubMenu.url, 'active') }}">
+                    <i class="{{ SubMenu.icon }}"></i> {{ SubMenu.name }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</li>
+{% endfor %}

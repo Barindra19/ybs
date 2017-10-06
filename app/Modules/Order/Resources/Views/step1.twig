@@ -1,0 +1,841 @@
+{% extends "admin::layouts.layout" %}
+
+{% block addcss %}
+
+{{ asset('plugins/select2/css/select2.min.css')| css_tag }}
+{{ asset('plugins/select2/css/select2-bootstrap.min.css')| css_tag }}
+
+{{ asset('plugins/bootstrap-toastr/toastr.min.css')| css_tag }}
+
+
+{{ asset('plugins/bootstrap-fileinput/bootstrap-fileinput.css') | css_tag }}
+
+<!-- DATEPICKER  -->
+{{ asset('plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css')|css_tag }}
+
+
+{% endblock %}
+
+{% block pageheader %}
+<!-- BEGIN PAGE HEAD-->
+<div class="page-head">
+    <div class="container">
+        <!-- BEGIN PAGE TITLE -->
+        <div class="page-title">
+            <h1>{{ string_menuname }}
+                <small>Form {{ string_menuname }}</small>
+            </h1>
+        </div>
+        <!-- END PAGE TITLE -->
+    </div>
+</div>
+<!-- END PAGE HEAD-->
+
+{% endblock %}
+
+
+{% block breadcrumbs %}
+<!-- BEGIN PAGE BREADCRUMBS -->
+<ul class="page-breadcrumb breadcrumb">
+    <li>
+        <a href="{{ url('/home') }}">Home</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <a href="javascript:void(0)">Order</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        New {{ string_menuname }}
+    </li>
+</ul>
+<!-- END PAGE BREADCRUMBS -->
+{% endblock %}
+
+{% block body %}
+<div class="row">
+  <div class="col-md-12">
+      <!-- BEGIN VALIDATION STATES-->
+      <div class="portlet light portlet-fit portlet-form bordered">
+          <div class="portlet-title">
+              <div class="caption">
+                  <i class="fa fa-shopping-cart font-green"></i>
+                  <span class="caption-subject font-green bold uppercase">New Order [{{ Order.ref_number }}] </span>
+              </div>
+              <div class="actions">
+                  {{ Barcode | raw }}
+              </div>
+          </div>
+          <div class="portlet-body">
+              <!-- BEGIN FORM-->
+              <form action="{{ route('order_save_laststep') }}" name="form_stepall" id="form_stepall" class="form-horizontal" method="post">
+                  {{ csrf_field() }}
+                  <!-- PARAMETER -->
+                  <input type="hidden" class="form-control" name="id" value="{{ order_id }}" />
+                  <!-- PARAMETER -->
+
+                  <div class="form-body">
+                    <!-- DATE TRANSACTION -->
+                    <div class="form-group {% if (errors.has('date_transaction')) %}has-error{% endif %}">
+                        <label class="control-label col-md-3">Tanggal Transaksi </label>
+                        <div class="col-md-3">
+                            <div class="input-icon right">
+                                <i class="fa fa-calendar"></i>
+                                <input type="text" class="form-control date-picker" data-date-format="dd-mm-yyyy" id="date_transaction" name="date_transaction" value="{{ DateNow }}" placeholder="dd-mm-yyyy" autocomplete="off"  tabindex="4" readonly>
+                                {% if (errors.has('date_transaction')) %}<span class="help-block"> {{ errors.first('date_transaction') }} </span>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END DATE TRANSACTION -->
+
+                      <!-- TRANSACTION BRANCH -->
+                      {% if (call_helpers('bool_CheckAccessUser','access-pusat')) %}
+                          <div class="form-group {% if (errors.has('branch_added')) %}has-error{% endif %}">
+                              <label class="control-label col-md-3">Transaksi di Branch
+                                  <span class="required"> * </span>
+                              </label>
+                              <div class="col-md-4">
+                                  <div class="input-icon right">
+                                      <i class="fa"></i>
+                                      <select name="branch_added" class="form-control select2" id="branch_added">
+                                          {% set ListBranch = call_helpers('get_ListBranch') %}
+                                          {% for key,value in ListBranch %}
+                                              <option value="{{ key }}" {{ BranchAddedID == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                          {% endfor %}
+                                      </select>
+                                      {% if (errors.has('branch_added')) %}<span class="help-block"> {{ errors.first('branch_added') }} </span>{% endif %}
+                                  </div>
+                              </div>
+                          </div>
+                      {% endif %}
+                      <!-- END TRANSACTION BRANCH -->
+
+                    <!-- BRANCH -->
+                    <div class="form-group {% if (errors.has('branch')) %}has-error{% endif %}">
+                        <label class="control-label col-md-3">Branch
+                            <span class="required"> * </span>
+                        </label>
+                        <div class="col-md-4">
+                          <div class="input-icon right">
+                              <i class="fa"></i>
+                              <select name="branch" class="form-control select2" id="branch">
+                                  {% set ListBranch = call_helpers('get_ListBranch') %}
+                                        {% for key,value in ListBranch %}
+                                            <option value="{{ key }}" {{ BranchID == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                        {% endfor %}
+                              </select>
+                              <span class="help-block">Pilih customer dari branch</span>
+                              {% if (errors.has('branch')) %}<span class="help-block"> {{ errors.first('branch') }} </span>{% endif %}
+                          </div>
+                           </div>
+                    </div>
+                    <!-- END BRANCH -->
+
+
+                    <!-- CUSTOMER -->
+                    <div class="form-group {% if (errors.has('customer')) %}has-error{% endif %}">
+                        <label class="control-label col-md-3">Customer
+                            <span class="required"> * </span>
+                        </label>
+                        <div class="col-md-4">
+                          <div class="input-icon right">
+                              <i class="fa"></i>
+                              <select class="form-control" name="customer" id="customer">
+                              </select>
+                              <div id="loadcustomer">&nbsp;</div>
+                              {% if (errors.has('customer')) %}<span class="help-block"> {{ errors.first('customer') }} </span>{% endif %}
+                          </div>
+                       </div>
+                       <div class="col-md-1">
+                           <button type="button" class="btn btn-warning" name="btn-SearchCustomer" id="btn-SearchCustomer" value="SearchCustomer"><i class="glyphicon glyphicon-search"></i> Search</button>
+                       </div>
+                       <div class="col-md-1">
+                           <button type="button" class="btn btn-success" name="btn-AddCustomer" id="btn-AddCustomer" value="AddCustomer"><i class="fa fa-plus-circle"></i> New</button>
+                       </div>
+                    </div>
+                    <!-- END CUSTOMER -->
+
+                    <!-- EVENT -->
+                    <div class="form-group {% if (errors.has('event')) %}has-error{% endif %}">
+                        <label class="control-label col-md-3">Event
+                        </label>
+                        <div class="col-md-4">
+                          <div class="input-icon right">
+                              <i class="fa"></i>
+                              <select class="form-control select2" name="event" id="event">
+                                  {% set ListEvent = call_helpers('get_ListEventbyID', BranchID) %}
+                                    {% for key,value in ListEvent %}
+                                        <option value="{{ key }}" {{ EventID == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                    {% endfor %}
+                              </select>
+                              <div id="loadcevent">&nbsp;</div>
+                              {% if (errors.has('event')) %}<span class="help-block"> {{ errors.first('event') }} </span>{% endif %}
+                          </div>
+                       </div>
+                    </div>
+                    <!-- END EVENT -->
+
+                    <hr>
+
+                    <div class="portlet light ">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="fa fa-check font-red"></i>
+                                <span class="caption-subject font-red sbold uppercase">Lengkapi detail order [{{ Order.ref_number }}]</span>
+                            </div>
+                            <div class="actions">
+                                <button type="button" class="btn btn-transparent red btn-outline btn-circle btn-sm" href="javascript:void(0);" id="btn-Add"><i class="fa fa-plus-square"></i> Add</button>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="table-scrollable">
+                                <table class="table table-hover table-light" id="order_detail">
+                                    <thead>
+                                        <tr>
+                                            <th> Treatment </th>
+                                            <th> Brand </th>
+                                            <th> Category </th>
+                                            <th> Paket </th>
+                                            <th> Discount </th>
+                                            <th> Additional </th>
+                                            <th> Total </th>
+                                            <th> Image </th>
+                                            <th> </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {%  for item in OrderDetail %}
+                                        <tr id="row{{ item.id}}">
+                                            <td>  {{ item.treatment.name }} </td>
+                                            <td> {{ item.merk.name }} </td>
+                                            {% if item.treatment_category_id %}
+                                            <td> {{ item.treatmentcategory.name }} </td>
+                                            {% else %}
+                                            <td> - </td>
+                                            {% endif %}
+                                            <td> {{ item.treatment_package }}  </td>
+
+                                            {% if item.discount > 0 %}
+                                            <td>
+                                                <span class="label label-sm label-danger"> {{ call_helpers('set_numberformat',item.price * item.discount / 100) }} </span>
+                                            </td>
+                                            {% else %}
+                                            <td> - </td>
+                                            {% endif %}
+
+                                            {% if item.additional > 0 %}
+                                            <td>
+                                                <span class="label label-sm label-info"> {{ call_helpers('set_numberformat',item.additional) }} </span>
+                                            </td>
+                                            {% else %}
+                                            <td> - </td>
+                                            {% endif %}
+                                            <td>
+                                                <span class="label label-sm label-success"> {{ call_helpers('set_numberformat',item.total) }} </span>
+                                            </td>
+
+                                            <td id="imageUpload{{ item.id }}">
+                                                {{ call_helpers('get_orderimage',item.id) }}
+                                            </td>
+
+                                            <td>
+                                                <a href="javascript:void(0)" class="btn btn-outline btn-circle red btn-sm black" onclick="deleteList({{ item.id }})"><i class="fa fa-trash-o"></i> Delete </a>
+                                                <a href="javascript:void(0)" class="btn btn-outline btn-circle blue btn-sm black" onclick="Upload({{ item.id }})"><i class="fa fa-cloud-upload"></i> Upload </a>
+                                           </td>
+                                        </tr>
+                                        {% endfor %}
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TOTAL -->
+                    <!-- <div class="form-group {% if (errors.has('price')) %}has-error{% endif %}">
+                        <label class="control-label col-md-3">Sub Total
+                            <span class="required"> * </span>
+                      </label>
+                        <div class="col-md-5">
+                            <div class="input-group"> -->
+                                <input type="hidden" class="form-control" id="total_header" name="total_header" placeholder="total_header" readonly value="{{ call_helpers('set_numberformat',Order.total) }}">
+                                <!-- {% if (errors.has('total_header')) %}<span class="help-block"> {{ errors.first('price') }} </span>{% endif %}
+                                <span class="input-group-btn">
+                                    <button class="btn green" type="button">Rp</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div> -->
+                    <!-- END TOTAL -->
+
+                    <!-- DISCOUNT -->
+                    <!-- <div class="form-group {% if (errors.has('discount_header')) %}has-error{% endif %}">
+                        <label class="control-label col-md-3">Discount
+                      </label>
+                        <div class="col-md-2">
+                            <div class="input-group"> -->
+                                <input type="hidden" class="form-control discount" id="discount_header" name="discount_header" placeholder="0 %" autocomplete="off" value="">
+                                <!-- {% if (errors.has('discount_header')) %}<span class="help-block"> {{ errors.first('discount_header') }} </span>{% endif %}
+                                <span class="input-group-btn">
+                                    <button class="btn red" type="button">%</button>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control rupiah" readonly id="nominaldiscount_header" name="nominaldiscount_header" placeholder="Rp 0,-" autocomplete="off" value="">
+                                {% if (errors.has('nominaldiscount_header')) %}<span class="help-block"> {{ errors.first('nominaldiscount_header') }} </span>{% endif %}
+                                <span class="input-group-btn">
+                                    <button class="btn red" type="button">Rp</button>
+                                </span>
+                            </div>
+                        </div>
+
+                    </div> -->
+                    <!-- END DISCOUNT -->
+
+                    <!-- ADDITIONAL -->
+                    <!-- <div class="form-group {% if (errors.has('additional_header')) %}has-error{% endif %}">
+                        <label class="control-label col-md-3">Additional
+                      </label>
+                        <div class="col-md-5">
+                            <div class="input-group"> -->
+                                <input type="hidden" class="form-control rp" id="additional_header" name="additional_header" placeholder="Rp 0,-" autocomplete="off" value="">
+                                <!-- {% if (errors.has('additional_header')) %}<span class="help-block"> {{ errors.first('additional_header') }} </span>{% endif %}
+                                <span class="input-group-btn">
+                                    <button class="btn green" type="button">Rp</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div> -->
+                    <!-- END ADDITIONAL -->
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">
+                      </label>
+                        <div class="col-md-3" id="loadcalculateheader">
+                        </div>
+                    </div>
+
+
+                    <!-- TOTAL -->
+                    <div class="form-group {% if (errors.has('total')) %}has-error{% endif %}">
+                        <label class="control-label col-md-3">Total
+                            <span class="required"> * </span>
+                      </label>
+                        <div class="col-md-5">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="grandtotal" name="grandtotal" placeholder="grandtotal" readonly value="{{ call_helpers('set_numberformat',Order.total) }}">
+                                {% if (errors.has('grandtotal')) %}<span class="help-block"> {{ errors.first('grandtotal') }} </span>{% endif %}
+                                <span class="input-group-btn">
+                                    <button class="btn green" type="button">Rp</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END TOTAL -->
+                    <!-- TYPE -->
+                    <div class="form-group {% if (errors.has('type')) %}has-error{% endif %}">
+                        <label class="control-label col-md-3">Tipe
+                            <span class="required"> * </span>
+                        </label>
+                        <div class="col-md-5">
+                          <div class="input-icon right">
+                              <i class="fa"></i>
+                              <select class="form-control select2" name="type" id="type">
+                                  {% set ListType = call_helpers('get_Type') %}
+                                    {% for key,value in ListType %}
+                                        <option value="{{ key }}" {{ Order.type == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                    {% endfor %}
+                              </select>
+                              <span class="help-block required"> Note : Mohon Pilih tipe pembayaran diatas.</span>
+                              {% if (errors.has('type')) %}<span class="help-block"> {{ errors.first('type') }} </span>{% endif %}
+                          </div>
+                           </div>
+                    </div>
+                    <!-- END TYPE -->
+
+                    <!-- PAYMENT -->
+                    <div class="form-group {% if (errors.has('payment')) %}has-error{% endif %}">
+                      <label class="control-label col-md-3">Pembayaran
+                          <span class="required"> * </span>
+                    </label>
+                      <div class="col-md-5">
+                          <div class="input-group">
+                              <input type="text" class="form-control rp" id="payment" name="payment" placeholder="Rp 0,-" autocomplete="off" value="">
+                              {% if (errors.has('payment')) %}<span class="help-block"> {{ errors.first('payment') }} </span>{% endif %}
+                              <span class="input-group-btn">
+                                  <button class="btn green" type="button">Rp</button>
+                              </span>
+                          </div>
+                      </div>
+                    </div>
+                    <!-- END PAYMENT -->
+
+                    <div class="form-group">
+                      <label class="control-label col-md-3">
+                    </label>
+                      <div class="col-md-3" id="loadcalculateresult">
+                      </div>
+                    </div>
+
+                    <!-- PAYMENT LEFT -->
+                    <div class="form-group {% if (errors.has('payment_left')) %}has-error{% endif %}">
+                      <label class="control-label col-md-3">Sisa
+                          <span class="required"> * </span>
+                    </label>
+                      <div class="col-md-5">
+                          <div class="input-group">
+                              <input type="text" class="form-control" id="payment_left" name="payment_left" placeholder="payment_left" readonly value="{{ call_helpers('set_numberformat',Order.total) }}">
+                              {% if (errors.has('payment_left')) %}<span class="help-block"> {{ errors.first('payment_left') }} </span>{% endif %}
+                              <span class="input-group-btn">
+                                  <button class="btn green" type="button">Rp</button>
+                              </span>
+                          </div>
+                      </div>
+                    </div>
+                    <!-- END PAYMENT LEFT -->
+
+                    <!-- PAYMENT TYPE -->
+                    <div class="form-group {% if (errors.has('payment_type')) %}has-error{% endif %}">
+                      <label class="control-label col-md-3">Metode Pembayaran
+                          <span class="required"> * </span>
+                      </label>
+                      <div class="col-md-5">
+                        <div class="input-icon right">
+                            <i class="fa"></i>
+                            <select name="payment_type" class="form-control select2" id="payment_type">
+                                {% set ListPaymentType = call_helpers('get_PaymentType') %}
+                                      {% for key,value in ListPaymentType %}
+                                          <option value="{{ key }}" {{ Order.payment_type_id == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                      {% endfor %}
+                            </select>
+                            <span class="help-block required"> Note : Mohon pilih metode pembayaran diatas.</span>
+                            {% if (errors.has('payment_type')) %}<span class="help-block"> {{ errors.first('payment_type') }} </span>{% endif %}
+                        </div>
+                         </div>
+                    </div>
+                    <!-- END PAYMENT TYPE -->
+
+                  </div>
+                  <div class="form-actions">
+                      <div class="row">
+                          <div class="col-md-offset-3 col-md-9">
+                            <button type="submit" class="btn btn-success" name="btn" value="Save"><i class="fa fa-save"></i> Simpan Transaksi</button>
+                          </div>
+                      </div>
+                  </div>
+
+
+              </form>
+              <!-- END FORM-->
+          </div>
+          <!-- END VALIDATION STATES-->
+      </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block addmodal %}
+<!-- UPLOAD IMAGE -->
+<div id="AddUploadImage" class="modal fade"  role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-full">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Upload Image - {{ Order.ref_number }}</h4>
+            </div>
+            <div class="modal-body">
+                <!-- BEGIN FORM-->
+                    <div class="form-body">
+                        <!-- TREATMENT -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group form-md-line-input has-warning">
+                                    <div class="col-md-3">
+                                      <input type="text" class="form-control" readonly id="treatment_modal" name="treatment">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" readonly id="merk_modal" name="merk">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" readonly id="category_modal" name="category">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" readonly id="package_modal" name="package">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- END  TREATMENT -->
+                        <br>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <form name="form_upload" id="form_upload" class="form-horizontal form-bordered" enctype="multipart/form-data" method="post">
+                                    {{ csrf_field() }}
+                                    <div class="form-body">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3"></label>
+                                            <div class="col-md-3">
+                                                <input type="hidden" id="order_id" name="order_id" value="{{ order_id }}">
+                                                <input type="hidden" id="order_detail_id" name="order_detail_id">
+                                                <button type="button" class="btn btn-info mt-ladda-btn ladda-button btn-circle" id="btn-addMoreItem"><i class="fa fa-plus"></i> Add</button>
+                                                <button type="submit" class="btn green mt-ladda-btn ladda-button btn-circle" id="btn-StartUpload"><i class="fa fa-cloud-upload"></i> Start Upload</button>
+                                            </div>
+                                        </div>
+                                        <div id="UploadImage">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn dark btn-outline btn-circle" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- END UPLOAD IMAGE  -->
+
+
+<!-- CONFIRM DELETE -->
+<div class="modal fade bs-modal-sm" id="ConfirmDelete" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-danger">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Delete Confirmation!</h4>
+            </div>
+            <div class="modal-body">
+                Are you sure??
+                <input type="hidden" id="id_delete" name="id_delete">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal" id="btn-DeleteRow">Delete</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- CONFIRM DELETE -->
+
+<!-- ADD CUSTOMER -->
+<div class="modal fade" id="ModalCustomer" role="dialog" tabindex="1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Add New Customer</h4>
+            </div>
+            <div class="modal-body">
+                <!-- BEGIN FORM-->
+                <form class="form-horizontal" name="save-customer" id="save-customer">
+                    {{ csrf_field() }}
+                    <div class="form-body">
+
+                    <!-- NAME -->
+                    <div class="form-group" id="row-name">
+                        <label class="control-label col-md-3">Name
+                            <span class="required"> * </span>
+                        </label>
+                        <div class="col-md-6">
+                          <div class="input-group">
+                              <input type="text" class="form-control" id="name_customer" name="name_customer" placeholder="Name" autocomplete="off" >
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END NAME -->
+
+                    <!-- ADDRESS -->
+                    <div class="form-group"  id="row-address">
+                            <label class="control-label col-md-3">Address
+                                <span class="required"> * </span>
+                            </label>
+                        <div class="col-md-6">
+                              <div class="input-icon right">
+                                  <i class="fa fa-building"></i>
+                                  <textarea class="form-control" id="address" name="address" placeholder="Customer Address">{% if state == 'add' %}{{ old('address') }}{% else %}{{ Customer.address }}{% endif %}</textarea>
+                                  {% if (errors.has('address')) %}<span class="help-block"> {{ errors.first('address') }} </span>{% endif %}
+                              </div>
+                       </div>
+                    </div>
+                    <!-- END ADDRESS -->
+
+                    <!-- PHONE -->
+                    <div class="form-group"  id="row-phone">
+                            <label class="control-label col-md-3">Phone
+                            </label>
+                        <div class="col-md-6">
+                              <div class="input-icon right">
+                                  <i class="fa fa-phone"></i>
+                                  <input type="text" class="form-control" id="phone" name="phone" placeholder="Example : 025183121xx" autocomplete="off" value="{% if state == 'add' %}{{ old('phone') }}{% else %}{{ Customer.phone }}{% endif %}">
+                                  {% if (errors.has('phone')) %}<span class="help-block"> {{ errors.first('phone') }} </span>{% endif %}
+                              </div>
+                       </div>
+                    </div>
+                    <!-- END PHONE -->
+
+                    <!-- MOBILE -->
+                    <!-- <div class="form-group" id="row-mobile">
+                            <label class="control-label col-md-3">Mobile
+                                <span class="required"> * </span>
+                            </label>
+                        <div class="col-md-6">
+                              <div class="input-icon right">
+                                  <i class="fa fa-mobile-phone"></i> -->
+                                  <input type="hidden" class="form-control mask_phone" id="mobile" name="mobile" placeholder="example : 08190888xxxx" autocomplete="off" value="0">
+                                  <!-- {% if (errors.has('mobile')) %}<span class="help-block"> {{ errors.first('mobile') }} </span>{% endif %}
+                              </div>
+                       </div>
+                    </div> -->
+                    <!-- END MOBILE -->
+
+                    <!-- EMAIL -->
+                    <div class="form-group" id="row-email">
+                            <label class="control-label col-md-3">Email
+                                <span class="required"> * </span>
+                            </label>
+                        <div class="col-md-6">
+                              <div class="input-icon right">
+                                  <i class="glyphicon glyphicon-envelope"></i>
+                                  <input type="text" class="form-control" id="email" name="email" placeholder="email" autocomplete="off" value="{% if state == 'add' %}{{ old('email') }}{% else %}{{ Customer.email }}{% endif %}">
+                                  {% if (errors.has('email')) %}<span class="help-block"> {{ errors.first('email') }} </span>{% endif %}
+                              </div>
+                       </div>
+                    </div>
+                    <!-- END EMAIL -->
+
+                    </div>
+                </form>
+                <!-- END FORM-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn dark btn-outline btn-circle" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger mt-ladda-btn ladda-button btn-circle" id="btn-AddCustomerNew">Add</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- ADD CUSTOMER  -->
+
+<!-- ADD DETAIL -->
+<div id="AddDetail" class="modal fade" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Select2 Demo In Modal</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" name="save-item" id="save-item">
+                    {{ csrf_field() }}
+                    <!-- BRAND -->
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Brand</label>
+                        <div class="col-md-8">
+                            <select name="merk" class="form-control select2" id="merk">
+                                {% set ListMerk = call_helpers('get_ListMerk') %}
+                                      {% for key,value in ListMerk %}
+                                          <option value="{{ key }}" {{ MerkID == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                      {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <!-- END BRAND -->
+
+                    <!-- TREATMENT -->
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Treatment</label>
+                        <div class="col-md-8">
+                            <select name="treatment" class="form-control select2" id="treatment">
+                                {% set ListTreatment = call_helpers('get_ListTreatment') %}
+                                      {% for key,value in ListTreatment %}
+                                          <option value="{{ key }}" {{ TreatmentID == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                      {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <!-- END TREATMENT -->
+
+                    <!-- TREATMENT CATEGORY -->
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Treatment Category</label>
+                        <div class="col-md-8">
+                            <select name="category" class="form-control select2" id="category">
+                            </select>
+                            <div id="loadcategory"></div>
+                        </div>
+                    </div>
+                    <!-- END TREATMENT CATEGORY -->
+
+                    <!-- TREATMENT PACKAGE -->
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Treatment Package</label>
+                        <div class="col-md-8">
+                            <select name="package" class="form-control select2" id="package">
+                            </select>
+                            <div id="loadpackage"></div>
+                        </div>
+                    </div>
+                    <!-- END TREATMENT PACKAGE -->
+
+
+                    <!-- HARGA -->
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Harga</label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <input type="text" readonly class="form-control" id="price_display" name="price_display" placeholder="price_display" autocomplete="off" value="0">
+                                <input type="hidden" id="price" name="price">
+                                <span class="input-group-btn">
+                                    <button class="btn green" type="button">Rp</button>
+                                </span>
+                              </div>
+                        </div>
+                    </div>
+                    <!-- END HARGA -->
+
+                    <!-- DISCOUNT -->
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Discount</label>
+                        <div class="col-md-2">
+                            <div class="input-group">
+                                <input type="text" class="form-control discount" id="discount" name="discount" placeholder="discount" autocomplete="off" value="0">
+                                <span class="input-group-btn">
+                                    <button class="btn red" type="button">%</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control rupiah" readonly id="nominaldiscount" name="nominaldiscount" placeholder="nominaldiscount" autocomplete="off" value="0">
+                                <span class="input-group-btn">
+                                    <button class="btn red" type="button">Rp</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <button class="btn" type="button">Total</button>
+                                </span>
+                                <input type="text" class="form-control rp" id="total" name="total" placeholder="total" autocomplete="off" value="0">
+                                <span class="input-group-btn">
+                                    <button class="btn green" type="button">Rp</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END DISCOUNT -->
+
+                    <!-- ADDITIONAL -->
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Additional</label>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control rp" id="additional" name="additional" placeholder="additional" autocomplete="off" value="0">
+                                <span class="input-group-btn">
+                                    <button class="btn green" type="button">Rp</button>
+                                </span>
+                          </div>
+                          <div id="loadcalculate"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="additional_description" name="additional_description" placeholder="Additional Note" autocomplete="off">
+                        </div>
+                    </div>
+                    <!-- END ADDITIONAL -->
+
+                    <input type="hidden" id="order_id" name="order_id" value="{{ order_id }}">
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn dark btn-outline btn-circle" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger mt-ladda-btn ladda-button btn-circle" id="btn-AddItem">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ADD DETAIL  -->
+
+
+
+    <!-- ERROR MESSAGE -->
+    <div class="modal fade" id="ShowErrMsg" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Warning!</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="msgError"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- ERROR MESSAGE -->
+{% endblock %}
+
+{% block addjs %}
+<script>
+    var IMG_SPINNER = '{{ theme_asset('img/input-spinner.gif') }}';
+</script>
+ <script src="//malsup.github.com/jquery.form.js"></script>
+
+<!-- VALIDATION -->
+{{ asset('plugins/jquery-validation/js/jquery.validate.min.js')|script_tag }}
+{{ asset('plugins/jquery-validation/js/additional-methods.min.js')|script_tag }}
+{{ asset('modules/order/validate.js')|script_tag }}
+
+{{ asset('plugins/bootstrap-toastr/toastr.min.js')|script_tag }}
+
+
+<!-- FILE INPUT -->
+{{ asset('plugins/bootstrap-fileinput/bootstrap-fileinput.js')|script_tag }}
+
+
+<!-- DROPDOWN -->
+{{ asset('plugins/select2/js/select2.full.min.js')|script_tag }}
+
+<!-- INPUT-MASK BUNDLE-->
+{{ asset('plugins/jquery-inputmask/jquery.inputmask.bundle.min.js')|script_tag }}
+
+<!-- JS INPUT-MASK -->
+{{ asset('js/input-mask/input-mask.js')|script_tag }}
+
+<!-- JS SELECT2 -->
+{{ asset('js/select2/select2.js')|script_tag }}
+
+<!-- JS -->
+{{ asset('modules/order/main.js')|script_tag }}
+
+
+<!-- DATEPICKER -->
+{{ asset('plugins/moment.min.js')|script_tag }}
+{{ asset('plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js')|script_tag }}
+{{ asset('plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js')|script_tag }}
+
+
+<!-- JS DATEPICKER -->
+{{ asset('js/datetimepicker/datetime_picker.js')|script_tag }}
+
+
+{% endblock %}

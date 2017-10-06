@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+    <!--<![endif]-->
+    <!-- BEGIN HEAD -->
+
+    <head>
+        {% block metadata %}
+            {% include "admin::partials/metadata" %}
+        {% endblock %}
+
+        <!-- BEGIN GLOBAL MANDATORY STYLES -->
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css" />
+        {{ asset('plugins/font-awesome/css/font-awesome.min.css')|css_tag }}
+        {{ asset('plugins/simple-line-icons/simple-line-icons.min.css')|css_tag }}
+        {{ asset('plugins/bootstrap/css/bootstrap.min.css')|css_tag }}
+        {{ asset('plugins/bootstrap-switch/css/bootstrap-switch.min.css')|css_tag }}
+        <!-- END GLOBAL MANDATORY STYLES -->
+        <!-- BEGIN PAGE LEVEL PLUGINS -->
+        {{ asset('plugins/select2/css/select2.min.css')|css_tag }}
+        {{ asset('plugins/select2/css/select2-bootstrap.min.css')|css_tag }}
+        {{ asset('plugins/icheck/skins/all.css')|css_tag }}
+        <!-- END PAGE LEVEL PLUGINS -->
+        <!-- BEGIN THEME GLOBAL STYLES -->
+        {{ theme_asset('admin::css/components.css')|css_tag }}
+        {{ theme_asset('admin::css/plugins.css')|css_tag }}
+        <!-- END THEME GLOBAL STYLES -->
+        <!-- BEGIN PAGE LEVEL STYLES -->
+        {{ theme_asset('admin::css/pages/login-2.min.css')|css_tag }}
+        <!-- END PAGE LEVEL STYLES -->
+        <!-- BEGIN THEME LAYOUT STYLES -->
+        <!-- END THEME LAYOUT STYLES -->
+        <link rel="shortcut icon" href="favicon.ico" /> </head>
+    <!-- END HEAD -->
+
+    <body class=" login">
+        <!-- BEGIN LOGO -->
+        <div class="logo">
+            <h2><strong>Distribution</strong><i>Portal</i></h2>
+          <!-- <img src="{base_url()}media/logo/{$Settings->file}" class="logo-default" alt="{$Settings->header_name}" style="width:100px;height:80px;" /> </a> -->
+        </div>
+        <!-- END LOGO -->
+        <!-- BEGIN LOGIN -->
+        <div class="content">
+            <!-- BEGIN REGISTRATION FORM -->
+            <form action="{{ route('post_choose_register') }}" method="POST">
+                {{ csrf_field() }}
+                <div class="form-title">
+                    <span class="form-title">Registration</span>
+                </div>
+                {% if errors.any %}
+                        {% for error in errors.all %}
+                        <div class="alert alert-danger">
+                            <button class="close" data-close="alert"></button>
+                            <span>
+                                {{ error }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                {% endif %}
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="icheck-list">
+                            <label style="color:white;">
+                                    <div class="iradio_square-grey">
+                                        <input name="status" class="icheck" data-radio="iradio_square-grey" type="radio" value="Sales">
+                                    </div> Sales
+                            </label>
+                            <label style="color:white;">
+                                    <div class="iradio_square-grey">
+                                        <input name="status" class="icheck" data-radio="iradio_square-grey" type="radio" value="Dealer">
+                                    </div> Dealer
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <a href="{{ url('/') }}" id="register-back-btn" class="btn btn-default">Back</a>&nbsp;
+                    <button type="submit" id="register-submit-btn" class="btn grey uppercase ">Next</button>
+                </div>
+            </form>
+            <!-- END REGISTRATION FORM -->
+
+        </div>
+        <div class="copyright hide"> 2016 © {{ config('app.name')}}</div>
+
+
+
+
+
+
+        <!--[if lt IE 9]>
+<script src="../assets/global/plugins/respond.min.js"></script>
+<script src="../assets/global/plugins/excanvas.min.js"></script>
+<script src="../assets/global/plugins/ie8.fix.min.js"></script>
+<![endif]-->
+
+
+<!-- BEGIN CORE PLUGINS -->
+{{ asset('plugins/jquery.min.js')|script_tag }}
+{{ asset('plugins/bootstrap/js/bootstrap.min.js')|script_tag }}
+{{ asset('plugins/js.cookie.min.js')|script_tag }}
+{{ asset('plugins/jquery-slimscroll/jquery.slimscroll.min.js')|script_tag }}
+{{ asset('plugins/jquery.blockui.min.js')|script_tag }}
+{{ asset('plugins/bootstrap-switch/js/bootstrap-switch.min.js')|script_tag }}
+<!-- END CORE PLUGINS -->
+<!-- BEGIN PAGE LEVEL PLUGINS -->
+{{ asset('plugins/jquery-validation/js/jquery.validate.min.js')|script_tag }}
+{{ asset('plugins/jquery-validation/js/additional-methods.min.js')|script_tag }}
+{{ asset('plugins/select2/js/select2.full.min.js')|script_tag }}
+{{ asset('plugins/icheck/icheck.min.js')|script_tag }}
+<!-- END PAGE LEVEL PLUGINS -->
+<!-- BEGIN THEME GLOBAL SCRIPTS -->
+{{ theme_asset('admin::js/app.min.js')|script_tag }}
+<!-- {{ theme_asset('plugins/backstretch/jquery.backstretch.min.js') }} -->
+<!-- END THEME GLOBAL SCRIPTS -->
+<!-- BEGIN PAGE LEVEL SCRIPTS -->
+{{ theme_asset('admin::js/app.min.js')|script_tag }}
+{{ theme_asset('admin::js/pages/login.min.js')|script_tag }}
+{{ theme_asset('admin::js/script/form-icheck.min.js')|script_tag }}
+<!-- END PAGE LEVEL SCRIPTS -->
+<!-- BEGIN THEME LAYOUT SCRIPTS -->
+<!-- END THEME LAYOUT SCRIPTS -->
+    </body>
+
+</html>

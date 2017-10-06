@@ -1,0 +1,73 @@
+{% extends "admin::layouts.layout_blank" %}
+
+{% block addcss %}
+
+{{ asset('plugins/cubeportfolio/css/cubeportfolio.css')| css_tag }}
+
+{% endblock %}
+{% block body %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="portlet light">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="fa fa-cog font-yellow-casablanca"></i>
+                    <span class="caption-subject bold font-yellow-casablanca uppercase"> Before & After </span>
+                    <span class="caption-helper">Foto Sebelum & Sesudah service</span>
+                </div>
+                <div class="inputs">
+               </div>
+            </div>
+            <div class="portlet-body">
+                <div id="js-filters-juicy-projects" class="cbp-l-filters-button">
+                    <div data-filter="*" class="cbp-filter-item-active cbp-filter-item btn dark btn-outline uppercase"> All
+                        <div class="cbp-filter-counter"></div>
+                    </div>
+                    <div data-filter=".sebelum" class="cbp-filter-item btn dark btn-outline uppercase"> Sebelum
+                        <div class="cbp-filter-counter"></div>
+                    </div>
+                    <div data-filter=".sesudah" class="cbp-filter-item btn dark btn-outline uppercase"> Sesudah
+                        <div class="cbp-filter-counter"></div>
+                    </div>
+                </div>
+                <div class="portfolio-content portfolio-1">
+                    <div id="js-grid-juicy-projects" class="cbp">
+                        {% for image in OrderImage %}
+                        {% set file = call_helpers_two('get_GenerateLinkImage','images/item/', image.file ) %}
+
+                        <div class="cbp-item {% if (image.flag == 1)%} sebelum {% else %} sesudah {% endif %}">
+                            <div class="cbp-caption">
+                                <div class="cbp-caption-defaultWrap">
+                                    <img src="{{ asset(file) }}" alt=""> </div>
+                                <div class="cbp-caption-activeWrap">
+                                    <div class="cbp-l-caption-alignCenter">
+                                        <div class="cbp-l-caption-body">
+                                            <a href="{{ asset(file) }}" class="cbp-lightbox cbp-l-caption-buttonRight btn red uppercase btn red uppercase" data-title="Dashboard<br>by Paul Flavius Nechita">view larger</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cbp-l-grid-projects-title uppercase text-center uppercase text-center">{{ image.order_detail.merk_name }}</div>
+                            <div class="cbp-l-grid-projects-desc uppercase text-center uppercase text-center">{{ call_helpers('get_OrderDetailInfo',image.order_detail_id ) }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+
+{% block addjs %}
+
+{{ asset('plugins/cubeportfolio/js/jquery.cubeportfolio.min.js')|script_tag }}
+
+<!-- JS IMAGE GALLERY -->
+{{ asset('js/image-gallery/image-gallery.js')|script_tag }}
+
+{% endblock %}

@@ -1,0 +1,419 @@
+{% extends "admin::layouts.layout" %}
+
+{% block addcss %}
+{{ asset('plugins/select2/css/select2.min.css')|css_tag }}
+{{ asset('plugins/select2/css/select2-bootstrap.min.css')|css_tag }}
+
+{{ asset('plugins/bootstrap-toastr/toastr.min.css')| css_tag }}
+
+{{ asset('plugins/datatables/datatables.min.css')|css_tag }}
+{{ asset('plugins/datatables/plugins/bootstrap/datatables.bootstrap.css')|css_tag }}
+{% endblock %}
+
+
+{% block pageheader %}
+<!-- BEGIN PAGE HEAD-->
+<div class="page-head">
+    <div class="container">
+        <!-- BEGIN PAGE TITLE -->
+        <div class="page-title">
+            <h1>{{ string_menuname }}
+                <small>List {{ string_menuname }}</small>
+            </h1>
+        </div>
+        <!-- END PAGE TITLE -->
+    </div>
+</div>
+<!-- END PAGE HEAD-->
+
+{% endblock %}
+
+
+{% block breadcrumbs %}
+<!-- BEGIN PAGE BREADCRUMBS -->
+<ul class="page-breadcrumb breadcrumb">
+    <li>
+        <a href="{{ url('/home') }}">Home</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <span>{{ string_menuname }}</span>
+    </li>
+</ul>
+<!-- END PAGE BREADCRUMBS -->
+{% endblock %}
+
+
+{% block body %}
+<div class="row">
+    <div class="col-md-12">
+        {% if (session('scsMsg')) %}
+        <div class="alert alert-block alert-success fade in">
+            <button type="button" class="close" data-dismiss="alert"></button>
+            <strong>Success!</strong> {{ session('scsMsg') }}
+            {% if (session('invoice')) %}
+                <a class="btn green" href="{{ session('invoice') }}"><i class="glyphicon glyphicon-print"></i> Print Invoice </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if (session('infoMsg')) %}
+        <div class="alert alert-block alert-info fade in">
+            <button type="button" class="close" data-dismiss="alert"></button>
+            <strong>Success!</strong> {{ session('infoMsg') }}
+        </div>
+        {% endif %}
+
+        <!-- BEGIN EXAMPLE TABLE PORTLET-->
+          <div class="portlet light">
+              <div class="portlet-title">
+                  <div class="caption">
+                      <i class="fa fa-cog font-yellow-casablanca"></i>
+                      <span class="caption-subject bold font-yellow-casablanca uppercase"> {{ string_active_menu }} {{ string_menuname }} Kirim Workshop </span>
+                      <span class="caption-helper">List {{ string_menuname }} {{ config_get('app.name') }}</span>
+                  </div>
+                  <div class="inputs">
+                      <div class="btn-group">
+                          <a class="btn green btn-sm" href="javascript:;" data-toggle="dropdown" aria-expanded="true">
+                              <i class="fa fa-list"></i> Lihat Data
+                              <i class="fa fa-angle-down"></i>
+                          </a>
+                          <ul class="dropdown-menu">
+                              <li>
+                                  <a href="{{ route('order_show') }}">
+                                      <i class="fa fa-circle-o-notch"></i> Proses </a>
+                              </li>
+                              <li>
+                                  <a href="{{ route('order_show_kirimworkshop') }}">
+                                      <i class="fa fa-circle-o-notch"></i> Kirim Workshop </a>
+                              </li>
+                              <li>
+                                  <a href="{{ route('order_show_proccessworkshop') }}">
+                                      <i class="fa fa-circle-o-notch"></i> Proses Workshop </a>
+                              </li>
+                              <li>
+                                  <a href="{{ route('order_show_kirimcounter') }}">
+                                      <i class="fa fa-circle-o-notch"></i> Kirim Counter </a>
+                              </li>
+                              <li>
+                                  <a href="{{ route('order_show_terimacounter') }}">
+                                      <i class="fa fa-circle-o-notch"></i> Terima Counter </a>
+                              </li>
+                              <li>
+                                  <a href="{{ route('order_show_qcchecked') }}">
+                                      <i class="fa fa-circle-o-notch"></i> Qc Checked </a>
+                              </li>
+                              <li>
+                                  <a href="{{ route('order_show_done') }}">
+                                      <i class="fa fa-check"></i> Selesai </a>
+                              </li>
+                              <li>
+                                  <a href="{{ route('order_show_takeitems') }}">
+                                      <i class="glyphicon glyphicon-saved"></i> Sudah Diambil </a>
+                              </li>
+                              <li class="divider"> </li>
+                              <li>
+                                  <a href="{{ route('order_show_all') }}">
+                                      <i class="i"></i> Semuanya </a>
+                              </li>
+                          </ul>
+                      </div>
+                         <a type="button" class="btn btn-default btn-sm" href="{{ route('order_add',0) }}" title="Form" data-toggle="tooltip"><i class="glyphicon glyphicon-plus"></i> Form</a>
+                 </div>
+              </div>
+              <div class="portlet-body">
+
+                  {% if errors.any %}
+                      {% for error in errors.all %}
+                          <div class="alert alert-danger">
+                              <button class="close" data-close="alert"></button>
+                              <span>
+                                  {{ error }}
+                              </span>
+                          </div>
+                      {% endfor %}
+                  {% endif %}
+
+                        <table class="table table-hover table-light" id="tbl_order_kirimworkshop">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Branch</th>
+                                    <th>Kode</th>
+                                    <th>Tanggal Transaksi</th>
+                                    <th>Customer</th>
+                                    <th>Pembayaran</th>
+                                    <th>Sisa Tagihan</th>
+                                    <th>Lunas</th>
+                                    <th>Status</th>
+                                    <th>Diinput Oleh</th>
+                                    <th>Diupdate Oleh</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <!--tbody section is required-->
+                            <tbody></tbody>
+                        </table>
+              </div>
+          </div>
+          <!-- END EXAMPLE TABLE PORTLET-->
+    </div>
+</div>
+{% endblock %}
+
+{% block addmodal %}
+    <!-- VIEW DETAIL -->
+    <div class="modal fade bs-modal-md" id="ViewOrder" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">View Detail - <label id="ref_number"></label></h4>
+                </div>
+                <div class="modal-body">
+                    <!-- BEGIN FORM-->
+                        <div class="form-body">
+
+                            <!-- DATE TRANSACTION -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Tanggal Transaksi
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="date_transaction" name="date_transaction">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  DATE TRANSACTION -->
+
+                            <!-- CUSTOMER NAME -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Customer
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="customer_name" name="customer_name">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  CUSTOMER NAME -->
+
+                            <!-- TOTAL -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Total
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="total" name="total">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  TOTAL -->
+
+                            <!-- DISCOUNT -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Discount
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="nominaldiscount" name="nominaldiscount">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  DISCOUNT -->
+
+                            <!-- ADDITIONAL -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Additional
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="additional" name="additional">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  ADDITIONAL -->
+
+                            <!-- DOWN PAYMENT -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Down Payment
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="down_payment" name="down_payment">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  DOWN PAYMENT -->
+
+                            <!-- PELUNASAN -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Pelunasan
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="full_payment" name="full_payment">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  PELUNASAN -->
+
+
+                            <!-- PAYMENT LEFT -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Sisa
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="payment_left" name="payment_left">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  PAYMENT LEFT -->
+
+                            <!-- PAID -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input has-info">
+                                        <label class="control-label col-md-4">Lunas
+                                        </label>
+                                        <div class="col-md-6">
+                                          <input type="text" class="form-control" readonly id="paid" name="paid">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  PAID -->
+
+
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <input id="order_id" type="hidden" name="id">
+                    <button type="button" class="btn purple btn-outline btn-circle" id="btn-ViewDetailOrder"><i class="fa fa-list-alt"></i> Lihat Rincian</button>
+                    <button type="button" class="btn yellow btn-outline btn-circle" id="btn-PrintInvoice"><i class="glyphicon glyphicon-print"></i> Invoice</button>
+                    <button type="button" class="btn red btn-outline btn-circle" id="btn-TakeItems"><i class="glyphicon glyphicon-saved"></i> Ubah Status</button>
+                    <button type="button" class="btn green btn-outline btn-circle" id="btn-Repayable"><i class="fa fa-money"></i> Pelunasan</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- VIEW DETAIL  -->
+
+    <!-- CHANGED STATUS -->
+    <div class="modal fade" id="ChangedStatus" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Ubah Status!</h4>
+                </div>
+                <div class="modal-body">
+
+                    <form class="form-horizontal" role="form">
+                        <div class="form-body">
+                            <!-- STATUS -->
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                  <div class="input-icon right">
+                                      <i class="fa"></i>
+                                      <select name="status" class="form-control select2me" id="status_changed">
+                                          {% set ListChangedStatus = call_helpers('get_ListChangedStatus') %}
+                                                <option value="">Pilih Status</option>
+                                                {% for key,value in ListChangedStatus %}
+                                                    <option value="{{ key }}" {{ Status == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                            {% endfor %}
+                                      </select>
+                                  </div>
+                                   </div>
+                            </div>
+                            <!-- END STATUS -->
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" id="btn-ChangedStatusNow">Ubah</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- CHANGED STATUS -->
+
+    <!-- ERROR MESSAGE -->
+    <div class="modal fade bs-modal-sm" id="ShowErrMsg" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-danger">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Warning!</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="msgError"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- ERROR MESSAGE -->
+
+{% endblock %}
+
+{% block addjs %}
+{{ asset('plugins/datatables/datatables.min.js')|script_tag }}
+{{ asset('plugins/datatables/plugins/bootstrap/datatables.bootstrap.js')|script_tag }}
+
+{{ asset('plugins/bootstrap-toastr/toastr.min.js')|script_tag }}
+
+{{ asset('plugins/cubeportfolio/js/jquery.cubeportfolio.min.js')|script_tag }}
+{{ asset('js/image-gallery/image-gallery.js')| script_tag }}
+
+
+<!-- DROPDOWN -->
+{{ asset('plugins/select2/js/select2.full.min.js')|script_tag }}
+
+<script>
+var ROUTE_DATATABLE = '{{ route('order_datatables') }}';
+var ROUTE_DATATABLE_ALL = '{{ route('order_datatables_all') }}';;
+var ROUTE_DATATABLE_DONE = '{{ route('order_datatables_done') }}';
+var ROUTE_DATATABLE_TAKEITEMS = '{{ route('order_datatables_takeitems') }}';
+var ROUTE_DATATABLE_KIRIMWORKSHOP = '{{ route('order_datatables_kirimworkshop') }}';
+var ROUTE_DATATABLE_PROCCESSWORKSHOP = '{{ route('order_datatables_proccessworkshop') }}';
+var ROUTE_DATATABLE_KIRIMCOUNTER = '{{ route('order_datatables_kirimcounter') }}';
+var ROUTE_DATATABLE_TERIMACOUNTER = '{{ route('order_datatables_terimacounter') }}';
+var ROUTE_DATATABLE_QCCOUNTER= '{{ route('order_datatables_qcchecked') }}';
+
+function ActionDelete(){
+    var id = $('#id').val();
+    window.location = BASE_URL + "/order/delete/" + id;
+}
+
+</script>
+{{ asset('modules/order/datatable.js')|script_tag }}
+{{ asset('modules/order/main.js')|script_tag }}
+{% endblock %}

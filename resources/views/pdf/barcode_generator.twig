@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Barcode</title>
+
+</head>
+
+<body>
+<table border="0" style="border-collapse:collapse;">
+    <tr>
+    {% set x = 0 %}
+    {% for Item in ArrBarcode %}
+            <td width="200" align="center">
+                <table>
+                    <tr>
+                        <td align="center">{{ Item.Barcode | raw }}</td>
+                    </tr>
+                    <tr>
+                        <td align="center"><font style="letter-spacing: 7px;">{{ Item.Format }}</font></td>
+                    </tr>
+                </table>
+            </td>
+        {% set x = x + 1 %}
+        {% if x == 3 %}
+            </tr>
+            <tr>
+            {% set x = 0 %}
+        {% endif %}
+    {% endfor %}
+    {% if x == 1 %}
+    </tr>
+    {% endif %}
+</table>
+</body>
+
+</html>

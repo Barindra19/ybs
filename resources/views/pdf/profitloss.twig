@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Report Transaction</title>
+    <style>
+        .font-value{
+            font-size: 12px;
+        }
+        .font-value-bold{
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .font-detail-value{
+            font-size: 9px;
+        }
+        .td-left-none{
+            border-left-style: none;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<h3>Report Transaction</h3>
+<h5>Transaction per tanggal {{ call_helpers('get_DateNow','d F Y H:i:s') }}</h5>
+<label class="font-value-bold"> Branch : {{ Branch }} ({{ Users.name }})</label>
+<table border="1" style="border-collapse:collapse;" cellpadding="3" cellspacing="3">
+    <thead>
+    <tr>
+        <th width="300" align="center">Pendapatan & Pengeluaran</th>
+        <th width="60" align="center">Debit</th>
+        <th width="60" align="center">Credit</th>
+        <th width="60" align="center">Mutasi</th>
+    </tr>
+    </thead>
+    <!--tbody section is required-->
+    <tbody>
+    {% set Total = 0 %}
+    {% for result in ArrResult %}
+        {% set Total = Total + result.Debit - result.Credit %}
+        <tr>
+            <td class="font-value" align="left">{{ result.Status.description }}</td>
+            <td class="font-value" align="right">{{ call_helpers('set_numberformat', result.Debit ) }}</td>
+            <td class="font-value" align="right">{{ call_helpers('set_numberformat', result.Credit ) }}</td>
+            <td class="font-value" align="right">{{ call_helpers('set_numberformat', Total ) }}</td>
+        </tr>
+    {% endfor %}
+    <tr>
+        <td class="font-value" align="right" colspan="3">Total</td>
+        <td class="font-value" align="right">{{ call_helpers('set_numberformat', Total ) }}</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+
+</html>

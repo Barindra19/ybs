@@ -1,0 +1,150 @@
+{% extends "admin::layouts.layout_invoice" %}
+
+
+{% block body %}
+
+<div class="page-content-inner">
+    <div class="invoice">
+        <div class="row invoice-logo">
+            <div class="col-xs-6 invoice-logo-space">
+                <img src="{{ asset('images/logo/yourbag.png') }}" class="img-responsive" alt="{{ asset('images/logo/yourbag.png') }}" style="width:150px;height:150px;" /> </div>
+            <div class="col-xs-6">
+                <p> #{{ Vars.Order.ref_number }} / {{ call_helpers_two('DateFormat',Vars.Order.date_transaction,'d F Y')  }}
+                    <span class="muted"> Your Bag Spa </span>
+                </p>
+            </div>
+        </div>
+        <hr/>
+        <div class="row">
+            <div class="col-xs-4">
+                <h3>Customer:</h3>
+                <ul class="list-unstyled">
+                    <li> {{ Vars.Order.customer_name }} </li>
+                    <li>{{ Vars.Order.customer.address }}</li>
+                    <li>{% if Vars.Order.customer.phone > 0 %}{{ Vars.Order.customer.phone }} {% if Vars.Order.customer.mobile > 0 %} / {% endif %}{% endif %}
+                    {% if Vars.Order.customer.mobile > 0 %} {{ Vars.Order.customer.mobile }}{% endif %}{{ Vars.Order.customer.mobile }}</li>
+                </ul>
+            </div>
+            <div class="col-xs-4">
+
+            </div>
+            <div class="col-xs-4 invoice-payment">
+                <h3>Payment Details:</h3>
+                <ul class="list-unstyled">
+                    <li>
+                        <strong>No. Order #:</strong> {{ Vars.Order.ref_number }} </li>
+                    <li>
+                        <strong>Email:</strong>  {{ Vars.Order.customer.email }}</li>
+                    <li>
+                        <strong>Metode Pembayaran:</strong> {% if Vars.Order.type == 0 %} {{ call_helpers('set_PaymentType', Vars.Order.payment_type_id )}} {% else %} {{ call_helpers('set_PaymentType', Vars.Order.payment_type_full_id )}} {% endif %} </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th> #No. </th>
+                            <th> Treatment </th>
+                            <th class="hidden-xs"> Brand </th>
+                            <th class="hidden-xs"> Price </th>
+                            <th class="hidden-xs"> Discount </th>
+                            <th class="hidden-xs"> Additional </th>
+                            <th> Total </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set i = 1 %}
+                        {% for item in Vars.OrderDetail %}
+                        {% set nominal_discount = item.price * item.discount / 100 %}
+                        {% set total = item.price - nominal_discount + item.additional %}
+                        <tr>
+                            <td> {{ i }} </td>
+                            <td> {{ item.treatment.name }} {% if item.treatment_category_id %}{{ item.treatmentcategory.name }} - {% endif %}{{ item.treatmentpackage.name }} </td>
+                            <td class="hidden-xs"> {{ item.merk.name }} </td>
+                            <td class="hidden-xs"> {{ call_helpers('set_numberformat', item.price) }} </td>
+                            <td class="hidden-xs"> {{ item.discount }}% </td>
+                            <td class="hidden-xs"> {{ call_helpers('set_numberformat', item.additional) }} </td>
+                            <td> {{ call_helpers('set_numberformat', item.total) }} </td>
+                        </tr>
+                        {% set i = i + 1 %}
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-4">
+                <div class="well">
+                    <address>
+                        <strong>{{ Vars.Users.branch.name }}.</strong>
+                        <br/> {{ Vars.Users.branch.address | raw }}<br>
+                        <abbr title="Phone">P:</abbr>
+                        {% if Vars.Users.branch.phone > 0 %}
+                                {{ Vars.Users.branch.phone }}
+                                {% if Vars.User.branch.mobile > 0 %}
+                                    /
+                                {% endif %}
+                            {% endif %}
+                            {% if Vars.Users.branch.mobile > 0 %}
+                                {{ Vars.Users.branch.mobile }}
+                            {% endif %}
+                     </address>
+                    <address>
+                        <strong>Name</strong>
+                        <br/>
+                        {{ Vars.Users.name }}
+                    </address>
+                    <address>
+                        <strong>Email</strong>
+                        <br/>
+                        <a href="mailto:{{ Vars.Users.email }}"> {{ Vars.Users.email }} </a>
+                    </address>
+                </div>
+            </div>
+            <div class="col-xs-8 invoice-block">
+                <ul class="list-unstyled amounts">
+                    {% if Vars.Order.discount > 0  or Vars.Order.additional > 0%}
+                    <li>
+                        <strong>Sub - Total:</strong> {{ call_helpers('set_numberformat', Vars.TotalOrderDetail )}} </li>
+                    {% endif %}
+                    {% if Vars.Order.discount > 0 %}
+                    <li>
+                        <strong>Discount:</strong> {{ call_helpers('set_numberformat', Vars.Order.discount )}}% </li>
+                    {% endif %}
+                    {% if Vars.Order.additional > 0 %}
+                    <li>
+                        <strong>Additional:</strong> {{ call_helpers('set_numberformat', Vars.Order.additional )}} </li>
+                    {% endif %}
+                    {% if Vars.Order.shipping_costs > 0 %}
+                    <li>
+                        <strong>Ongkos kirim:</strong> {{ call_helpers('set_numberformat', Vars.Order.shipping_costs )}} </li>
+                    {% endif %}
+                    <li>
+                        <strong>Grand Total:</strong> {{ call_helpers('set_numberformat', Vars.Order.total - Vars.Discount + Vars.Order.additional + Vars.Order.shipping_costs )}} </li>
+                    {% if Vars.Order.type == 1 %}
+                    <li>
+                        <strong>DP({{ call_helpers('set_PaymentType', Vars.Order.payment_type_id )}}):</strong> {{ call_helpers('set_numberformat', Vars.Order.down_payment )}} </li>
+                    {% endif %}
+                    <li>
+                        <strong>Payment ({% if Vars.Order.type == 0 %} {{ call_helpers('set_PaymentType', Vars.Order.payment_type_id )}} {% else %} {{ call_helpers('set_PaymentType', Vars.Order.payment_type_full_id )}} {% endif %}):</strong>
+                        {% if Vars.Order.type == 0 %} {{ call_helpers('set_numberformat', Vars.Order.down_payment )}} {% else %} {{ call_helpers('set_numberformat', Vars.Order.full_payment )}} {% endif %}
+                     </li>
+                     <li>
+                         <strong>Sisa:</strong>
+                            {% if Vars.Order.payment_left == 0 %} <strong><i>LUNAS</i></strong> {% else %} {{ call_helpers('set_numberformat', Vars.Order.payment_left )}} {% endif %}
+                      </li>
+                </ul>
+                <br/>
+                <a class="btn btn-lg green hidden-print margin-bottom-5" href="{{ url('/') }}"> Cek Order
+                    <i class="fa fa-check"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,383 @@
+{% extends "admin::layouts.layout_print" %}
+{% block body %}
+
+  <style>
+ @page {
+        size: A4;
+        margin: .3in .4in .0in .4in;
+    }
+        p{
+        margin:0;
+        }
+    @media print {
+        html, body {
+            width: 290mm;
+            height: 210mm;
+
+        }
+                p{
+        margin:0;
+        }
+        @page {size: landscape}
+        .page {
+            margin: 0;
+            border: initial;
+            border-radius: initial;
+            width: initial;
+            min-height: initial;
+            box-shadow: initial;
+            background: initial;
+        }
+    }
+
+    body {
+font-size: 11px;
+}
+
+.table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+    border-top: 1px solid #e7ecf1;
+    font-size: 11px;
+    line-height: 0.429;
+    padding: 7px;
+    vertical-align: top;
+
+    </style>
+
+<div class="container page">
+	<div class="row">
+	<div class="col-xs-6" style="max-width: 47%; margin-right:3%;">
+		<div class="row">
+	    <div class="col-xs-3" style="margin-right: -25px">
+<img src="{{ asset('images/logo/yourbag.png') }}" class="img img-responsive" style="max-height:80px;">
+</div>
+        	<div class="col-xs-6" style="width:235px;">
+        	      {{ BranchInfo.name }} <br>
+                  {{ BranchInfo.address | raw }} <br>
+                  Telp :
+                    {% if BranchInfo.phone > 0 %}{{ BranchInfo.phone }} {% endif %}
+
+        	</div>
+        	<div class="col-xs-3" style="margin-left: 15px">
+            	{{ Order.ref_number }} <br>
+            	{{ call_helpers_two('DateFormat',Order.date_transaction,'d F Y')  }} <br>
+            	{{ Order.customer_name }} <br>
+		{{ Order.customer.phone }}
+        	</div>
+	       </div>
+
+      <div class="row">
+        <table class="table" border="0" style="margin-bottom: 10px; margin-top: 10px;">
+            <tr>
+                <th align="center">No</th>
+                <th align="center">Treatment</th>
+                <th align="center">Detail</th>
+                <th align="center">Brand</th>
+                <th align="center">Harga</th>
+            </tr>
+            {% set i = 1 %}
+            {% for item in OrderDetail %}
+            <tr>
+                <td>{{ i }}.</td>
+
+                <td>{{ item.treatment.name }}</td>
+                <td>{% if item.treatment_category_id %}{{ item.treatmentcategory.name }} - {% endif %}{{ item.treatmentpackage.name }}</td>
+                <td>{{ item.merk.name }}</td>
+		<td align="right">{{ call_helpers('set_numberformat', item.price) }}</td>
+            </tr>
+            {% set i = i + 1 %}
+            {% endfor %}
+            {% if Discount_detail > 0  or Additional_detail > 0%}
+            <tr>
+    			<td colspan="3">Subtotal</td>
+    			<td colspan="2" align="right">{{ call_helpers('set_numberformat', TotalOrderDetail )}}</td>
+			</tr>
+            {% endif %}
+
+            {% if Discount_detail > 0 %}
+            <tr>
+    			<td colspan="3">Discount</td>
+    			<td colspan="2" align="right">{{ call_helpers('set_numberformat', Discount_detail )}}</td>
+			</tr>
+            {% endif %}
+
+            <!-- {% if Order.discount > 0 %}
+            <tr>
+    			<td colspan="3">Discount ({{  Order.discount }} %)</td>
+    			<td colspan="2" align="right">{{ call_helpers('set_numberformat', TotalOrderDetail * Order.discount / 100)}}</td>
+			</tr>
+            {% endif %} -->
+
+            {% if Additional_detail > 0 %}
+            <tr>
+    			<td colspan="4">Additional<br/><br/>
+                <label style="font-size: 8px; margin-bottom:0; line-height:10px;">
+                    {% for item in OrderDetail %}
+                        {{ item.merk.name }}-{{ item.additional_description }},
+                    {% endfor %}
+                    </label>
+                </td>
+    			<td colspan="2" align="right"> {{ call_helpers('set_numberformat', Additional_detail )}}</td>
+			</tr>
+            {% endif %}
+
+            <!-- {% if Order.additional > 0 %}
+            <tr>
+    			<td colspan="3">Additional</td>
+    			<td colspan="2" align="right"> {{ call_helpers('set_numberformat', Order.additional )}}</td>
+			</tr>
+            {% endif %} -->
+
+            {% if Order.shipping_costs > 0 %}
+            <tr>
+    			<td colspan="3">Ongkos kirim</td>
+    			<td colspan="2" align="right"> {{ call_helpers('set_numberformat', Order.shipping_costs )}}</td>
+			</tr>
+            {% endif %}
+            <tr>
+    			<td colspan="3">Total</td>
+    			<td colspan="2" align="right">{{ call_helpers('set_numberformat', Order.total - Discount + Order.additional + Order.shipping_costs )}}</td>
+			</tr>
+
+            <!-- JIKA PELUNASAN -->
+            {% if Order.type == 1 %}
+            <tr>
+    			<td colspan="3">DP ( {{ call_helpers('set_PaymentType', Order.payment_type_id )}} )</td>
+    			<td colspan="2" align="right">{{ call_helpers('set_numberformat', Order.down_payment )}}</td>
+			</tr>
+            {% endif %}
+            <!-- END JIKA PELUNASAN -->
+
+			<tr>
+    			<td colspan="3">Bayar ({% if Order.type == 0 %} {{ call_helpers('set_PaymentType', Order.payment_type_id )}} {% else %} {{ call_helpers('set_PaymentType', Order.payment_type_full_id )}} {% endif %})</td>
+    			<td colspan="2" align="right">{% if Order.type == 0 %} {{ call_helpers('set_numberformat', Order.down_payment )}} {% else %} {{ call_helpers('set_numberformat', Order.full_payment )}} {% endif %}</td>
+			</tr>
+
+            <tr>
+    			<td colspan="3">Sisa</td>
+    			<td colspan="2" align="right">{% if Order.payment_left == 0 %} <strong><i>LUNAS</i></strong> {% else %} {{ call_helpers('set_numberformat', Order.payment_left )}} {% endif %}</td>
+			</tr>
+            <!-- LOOPING IMAGE -->
+            <tr>
+    			<td>&nbsp;</td>
+                {% for item in OrderDetail %}
+                    {% if call_helpers('get_CountOrderImageOne', item.id) > 0 %}
+                    {% set file = call_helpers('get_OrderImageOne', item.id) %}
+    			<td><img src="{{ asset(file) }}" class="img img-responsive" style="height:80px;width:80px;"></td>
+                    {% endif %}
+                {% endfor %}
+			</tr>
+            <tr>
+    			<td>&nbsp;</td>
+		{% set i=1 %}
+                {% for item in OrderDetail %}
+                    {% if call_helpers('get_CountOrderImageOne', item.id) > 0 %}
+    			             <td>{{ i }}. {{ item.treatment.name }}</td>
+                    {% set i = i + 1 %}
+		    {% endif %}
+                {% endfor %}
+			</tr>
+            <!-- END LOOPING IMAGE -->
+
+		</table>
+	</div>
+
+
+	<div class="row">
+		<div class="col-md-7">
+        	Saya setuju dengan syarat &amp; ketentuan yang berlaku<br/>
+        	{{ BranchInfo.city }}, {{ DateNow }}<br/>
+        	<br/><br/>
+        	<p>______________</p>
+        </div>
+	</div>
+	   <br/>
+    	<div class="row" >
+<div  style=" margin-left:5px; font-size:12px">
+<table>
+{% for item in OrderDetail %}
+<td style="width:auto; padding-right:20px;">
+		<b> YBS {{ BranchInfo.name | slice(13) }}</b> <br>
+        	Customer:<br> <b>{{ Order.customer.name }} <br/>
+		{{ Order.customer.phone }}</b><br/>
+        	Tgl:<b> {{ call_helpers_two('DateFormat',Order.date_transaction,'d F Y')  }}</b> <br/>
+		No:<b> {{ Order.ref_number }} </b><br/>
+		<b> {{ item.merk.name }}</b><br>
+            {{ item.treatment.name }} {% if item.treatment_category_id %}{{ item.treatmentcategory.name }} - {% endif %}{{ item.treatmentpackage.name }}<br/>
+            <br/>Ket.: __________________
+
+</td>
+{% endfor %}</table>
+</div>
+
+    	</div>
+	</div>
+
+	<div class="col-xs-6" style="max-width: 47%; margin-left:3%;">
+		<div class="row">
+<div class="col-xs-3" style="margin-right: -25px">
+<img src="{{ asset('images/logo/yourbag.png') }}" class="img img-responsive" style="max-height:80px;">
+</div>
+        	<div class="col-xs-6" style="width:235px;">
+        	      {{ BranchInfo.name }} <br>
+                  {{ BranchInfo.address | raw }} <br>
+                  Telp :
+                    {% if BranchInfo.phone > 0 %}{{ BranchInfo.phone }} {% endif %}
+
+        	</div>
+        	<div class="col-xs-3" style="margin-left: 15px">
+            	{{ Order.ref_number }} <br>
+            	{{ call_helpers_two('DateFormat',Order.date_transaction,'d F Y')  }} <br>
+            	{{ Order.customer_name }} <br>
+		{{ Order.customer.phone }}
+
+        	</div>
+	       </div>
+
+	<div class="row">
+        <table class="table" border="0" style="margin-bottom: 10px; margin-top: 10px;">
+            <tr>
+                <th align="center">No.</th>
+                <th align="center">Treatment</th>
+                <th align="center">Detail</th>
+                <th align="center">Brand</th>
+                <th align="center">Harga</th>
+            </tr>
+            {% set i = 1 %}
+            {% for item in OrderDetail %}
+            <tr>
+                <td>{{ i }}.</td>
+                <td>{{ item.treatment.name }}</td>
+                <td>{% if item.treatment_category_id %}{{ item.treatmentcategory.name }} - {% endif %}{{ item.treatmentpackage.name }}</td>
+                <td>{{ item.merk.name }}</td>
+                <td align="right">{{ call_helpers('set_numberformat', item.price) }}</td>
+            </tr>
+            {% set i = i + 1 %}
+            {% endfor %}
+
+            {% if Discount_detail > 0  or Additional_detail > 0%}
+            <tr>
+    			<td colspan="3">Subtotal</td>
+    			<td colspan="2" align="right">{{ call_helpers('set_numberformat', TotalOrderDetail )}}</td>
+			</tr>
+            {% endif %}
+
+            {% if Discount_detail > 0 %}
+            <tr>
+    			<td colspan="3">Discount</td>
+    			<td colspan="2" align="right">{{ call_helpers('set_numberformat', Discount_detail )}}</td>
+			</tr>
+            {% endif %}
+
+            <!-- {% if Order.discount > 0 %}
+            <tr>
+    			<td colspan="3">Discount ({{  Order.discount }} %)</td>
+    			<td colspan="2" align="right">{{ call_helpers('set_numberformat', TotalOrderDetail * Order.discount / 100)}}</td>
+			</tr>
+            {% endif %} -->
+
+            {% if Additional_detail > 0 %}
+            <tr>
+    			<td colspan="4">Additional<br/><br/>
+                <label style="font-size: 8px; margin-bottom:0; line-height:10px;">
+                    {% for item in OrderDetail %}
+                        {{ item.merk.name }}-{{ item.additional_description }},
+                    {% endfor %}
+                    </label>
+                </td>
+    			<td colspan="2" align="right"> {{ call_helpers('set_numberformat', Additional_detail )}}</td>
+			</tr>
+            {% endif %}
+
+            <!-- {% if Order.additional > 0 %}
+            <tr>
+    			<td colspan="3">Additional</td>
+    			<td colspan="2" align="right"> {{ call_helpers('set_numberformat', Order.additional )}}</td>
+			</tr>
+            {% endif %} -->
+
+            {% if Order.shipping_costs > 0 %}
+            <tr>
+    			<td colspan="3">Ongkos kirim</td>
+    			<td colspan="2" align="right"> {{ call_helpers('set_numberformat', Order.shipping_costs )}}</td>
+			</tr>
+            {% endif %}
+            <tr>
+    			<td colspan="3">Total</td>
+    			<td colspan="2" align="right">{{ call_helpers('set_numberformat', Order.total - Discount + Order.additional + Order.shipping_costs )}}</td>
+			</tr>
+
+            <!-- JIKA PELUNASAN -->
+            {% if Order.type == 1 %}
+            <tr>
+    			<td colspan="3">DP ( {{ call_helpers('set_PaymentType', Order.payment_type_id )}} )</td>
+    			<td colspan="2" align="right">{{ call_helpers('set_numberformat', Order.down_payment )}}</td>
+			</tr>
+            {% endif %}
+            <!-- END JIKA PELUNASAN -->
+
+			<tr>
+    			<td colspan="3">Bayar ({% if Order.type == 0 %} {{ call_helpers('set_PaymentType', Order.payment_type_id )}} {% else %} {{ call_helpers('set_PaymentType', Order.payment_type_full_id )}} {% endif %})</td>
+    			<td colspan="2" align="right">{% if Order.type == 0 %} {{ call_helpers('set_numberformat', Order.down_payment )}} {% else %} {{ call_helpers('set_numberformat', Order.full_payment )}} {% endif %}</td>
+			</tr>
+
+            <tr>
+    			<td colspan="3">Sisa</td>
+    			<td colspan="2" align="right">{% if Order.payment_left == 0 %} <strong><i>LUNAS</i></strong> {% else %} {{ call_helpers('set_numberformat', Order.payment_left )}} {% endif %}</td>
+			</tr>
+            <!-- LOOPING IMAGE -->
+            <tr>
+    			<td>&nbsp;</td>
+                {% for item in OrderDetail %}
+                    {% if call_helpers('get_CountOrderImageOne', item.id) > 0 %}
+                    {% set file = call_helpers('get_OrderImageOne', item.id) %}
+    			<td><img src="{{ asset(file) }}" class="img img-responsive" style="height:80px;width:80px;"></td>
+                    {% endif %}
+                {% endfor %}
+			</tr>
+            <tr>
+    			<td>&nbsp;</td>
+                {% for item in OrderDetail %}
+                    {% if call_helpers('get_CountOrderImageOne', item.id) > 0 %}
+    			             <td>{{ item.treatment.name }}</td>
+                    {% endif %}
+                {% endfor %}
+			</tr>
+            <!-- END LOOPING IMAGE -->
+
+		</table>
+	</div>
+
+	<div class="row">
+		<div class="col-md-7">
+        	Saya setuju dengan syarat &amp; ketentuan yang berlaku<br/>
+    		{{ BranchInfo.city }}, {{ DateNow }}<br/>
+        	<br/><br/>
+        	<p>______________</p>
+	   </div>
+<div class="col-md-3">
+<br><br>
+            {{ Barcode | raw }}
+            &nbsp;&nbsp;<font style="letter-spacing: 8px;">{{ BarcodeCode }}</font>
+</div>
+	</div>
+
+	<div class="row" style="margin-left:0px; font-size:9px;">
+	       <br/>Syarat dan Ketentuan
+	              <br/>Pelanggan yang terhormat, berikut ini adalah informasi yang perlu diketahui oleh Pelanggan:
+                  <ul style="font-size:9px;">
+                      <li>Pelanggan yang terhormat, berikut ini adalah Syarat dan Ketentuan yang perlu diketahui oleh Pelanggan:</li>
+			<li>Beberapa noda pada proses cleaning (pembersihan) tidak dapat hilang secara sempurna (YBS akan berusaha semaksimal mungkin);</li>
+			<li>Aroma tidak sedap yang sudah lama tidak dapat hilang dengan sempurna</li>
+			<li>Warna bahan kulit dapat pudar oleh pencucian, </li>
+			<li>Garis noda yang membandel akibat oksidasi (rusak akibat udara panas dan oksigen), coretan pena (pada umumnya) tidak dapatdihilangkan dalam proses cleaning;</li>
+			<li>Pelanggan harap melakukan pengecekan saat pengambilan (adanya keluhan atau saran segera diberikan ditempat, diluar itu bukan menjadi tanggung jawab pihak YBS);</li>
+			<li>Perbaikan dan costumization (penambahan) dapat berbeda dengan bawaan aslinya;</li>
+			<li>Ketika timbul kerusakan atau  kehilangan atas kelalaian pihak YBS maka pelanggan berhak atas ganti rugi sebesar 3 (tiga) kali biaya pelayanan jasa tersebut.</li>
+                  <ul>
+
+	</div>
+	</div>
+	</div>
+</div>
+
+{% endblock %}

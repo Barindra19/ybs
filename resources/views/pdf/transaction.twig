@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Report Transaction</title>
+    <style>
+    .font-value{
+        font-size: 12px;
+    }
+    .font-value-bold{
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .font-detail-value{
+        font-size: 9px;
+    }
+    .td-left-none{
+        border-left-style: none;
+    }
+
+    </style>
+</head>
+
+<body>
+
+  <h3>Report Transaction</h3>
+  <h5>Transaction per tanggal {{ call_helpers('get_DateNow','d F Y H:i:s') }}</h5>
+  <label class="font-value-bold"> Branch : {{ Branch }} ({{ Users.name }})</label>
+  <table border="1" style="border-collapse:collapse;" cellpadding="3" cellspacing="3">
+      <thead>
+          <tr>
+              <th align="center" width="10px;">No.</th>
+              <th align="center" width="180px;">No. Bukti</th>
+              <th align="center" width="200px;">Description</th>
+              <th align="center" width="80px;">Tanggal</th>
+              <th align="center" width="60px;">Debit</th>
+              <th align="center" width="60px;">Credit</th>
+          </tr>
+      </thead>
+      <!--tbody section is required-->
+      <tbody>
+          {% if (ResultOrder) %}
+          {% set i = 1 %}
+          {% for item in ResultOrder %}
+          <tr>
+              <td class="font-value" align="right" width="10px;">{{ i }}.</td>
+              <td class="font-value" width="180px;">{{ item.notransaction }}</td>
+              <td class="font-value" width="200px;">{{ item.description }}</td>
+              <td class="font-value" width="80px;">{{ call_helpers_two('DateFormat', item.date_transaction ,"d/m/Y H:i:s" ) }}</td>
+              <td class="font-value" align="right" width="60px;">{{ call_helpers('set_numberformat',item.debit) }}</td>
+              <td class="font-value" align="right" width="60px;">{{ call_helpers('set_numberformat',item.credit) }}</td>
+          </tr>
+          {% set i = i + 1 %}
+          {% endfor %}
+          <tr>
+              <td colspan="4" class="font-value" align="right">Total</td>
+              <td class="font-value" align="right">{{ call_helpers('set_numberformat',SumDebit) }}</td>
+              <td class="font-value" align="right">{{ call_helpers('set_numberformat',SumCredit) }}</td>
+          </tr>
+          {% endif %}
+      </tbody>
+  </table>
+
+</body>
+
+</html>
