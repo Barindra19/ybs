@@ -183,7 +183,7 @@ class OrderController extends Controller
             })
 
             ->editColumn('date_transaction', function ($Order) {
-                    return DateFormat($Order->date_transaction,"d/m/Y H:i:s");
+                    return DateFormat($Order->date_transaction,"d/m/Y");
             })
 
 
@@ -243,7 +243,7 @@ class OrderController extends Controller
             })
 
             ->editColumn('date_transaction', function ($Order) {
-                    return DateFormat($Order->date_transaction,"d/m/Y H:i:s");
+                return DateFormat($Order->date_transaction,"d/m/Y");
             })
 
 
@@ -302,7 +302,7 @@ class OrderController extends Controller
             })
 
             ->editColumn('date_transaction', function ($Order) {
-                    return DateFormat($Order->date_transaction,"d/m/Y H:i:s");
+                    return DateFormat($Order->date_transaction,"d/m/Y");
             })
 
 
@@ -361,7 +361,7 @@ class OrderController extends Controller
             })
 
             ->editColumn('date_transaction', function ($Order) {
-                    return DateFormat($Order->date_transaction,"d/m/Y H:i:s");
+                return DateFormat($Order->date_transaction,"d/m/Y");
             })
 
 
@@ -421,7 +421,7 @@ class OrderController extends Controller
             })
 
             ->editColumn('date_transaction', function ($Order) {
-                    return DateFormat($Order->date_transaction,"d/m/Y H:i:s");
+                return DateFormat($Order->date_transaction,"d/m/Y");
             })
 
 
@@ -480,7 +480,7 @@ class OrderController extends Controller
             })
 
             ->editColumn('date_transaction', function ($Order) {
-                    return DateFormat($Order->date_transaction,"d/m/Y H:i:s");
+                return DateFormat($Order->date_transaction,"d/m/Y");
             })
 
 
@@ -542,7 +542,7 @@ class OrderController extends Controller
             })
 
             ->editColumn('date_transaction', function ($Order) {
-                    return DateFormat($Order->date_transaction,"d/m/Y H:i:s");
+                return DateFormat($Order->date_transaction,"d/m/Y");
             })
 
 
@@ -598,7 +598,7 @@ class OrderController extends Controller
             })
 
             ->editColumn('date_transaction', function ($Order) {
-                    return DateFormat($Order->date_transaction,"d/m/Y H:i:s");
+                return DateFormat($Order->date_transaction,"d/m/Y");
             })
 
 
@@ -661,7 +661,7 @@ class OrderController extends Controller
             })
 
             ->editColumn('date_transaction', function ($Order) {
-                    return DateFormat($Order->date_transaction,"d/m/Y H:i:s");
+                return DateFormat($Order->date_transaction,"d/m/Y");
             })
 
 
@@ -821,63 +821,63 @@ class OrderController extends Controller
 
     }
 
-    public function step3($id){
-        $this->_data['state']                       = 'add';
-        $this->_data['string_active_menu']          = 'Add/Edit';
-        $this->_data['IDSUBMENU']                   = 'AddOrder';
-        $Users                                      = Auth::user();
-        $Order                                      = OrderModel::find($id);
-        $this->_data['order_id']                    = $id;
-
-        $this->_data['Order']                       = $Order;
-
-        $OrderDetail                                = OrderDetailModel::where('order_id','=',$id)->get();
-        $this->_data['OrderDetail']                 = $OrderDetail;
-
-        return Theme::view('modules.order.step3',$this->_data);
-    }
-
-    public function save_step3(Request $request){
-        $validator = Validator::make($request->all(), [
-            'id'                    => 'required'
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput($request->input());
-        }
-
-        $id_order                                  = $request->id;
-
-        if(OrderDetailModel::where('order_id',$id_order)->count() == 0){
-            return redirect()->back()->withInput($request->input())->with('errMsg',"Please add item Order");
-        }
-
-        return redirect()
-            ->route('order_show_step4',$id_order)
-            ->with('infoMsg',"Please Confirmation Order");
-
-    }
-
-    public function step4($id){
-        $this->_data['state']                       = 'add';
-        $this->_data['string_active_menu']          = 'Add/Edit';
-        $this->_data['IDSUBMENU']                   = 'AddOrder';
-
-        $Users                                      = Auth::user();
-        $Order                                      = OrderModel::find($id);
-        $this->_data['order_id']                    = $id;
-
-        $this->_data['Order']                       = $Order;
-
-        $OrderDetail                                = OrderDetailModel::where('order_id','=',$id)->get();
-        $this->_data['OrderDetail']                 = $OrderDetail;
-
-        $OrderImage                                 = OrderImageModel::where('order_id','=',$id)->get();
-        $this->_data['OrderImage']                  = $OrderImage;
-
-
-        return Theme::view('modules.order.step4',$this->_data);
-    }
+//    public function step3($id){
+//        $this->_data['state']                       = 'add';
+//        $this->_data['string_active_menu']          = 'Add/Edit';
+//        $this->_data['IDSUBMENU']                   = 'AddOrder';
+//        $Users                                      = Auth::user();
+//        $Order                                      = OrderModel::find($id);
+//        $this->_data['order_id']                    = $id;
+//
+//        $this->_data['Order']                       = $Order;
+//
+//        $OrderDetail                                = OrderDetailModel::where('order_id','=',$id)->get();
+//        $this->_data['OrderDetail']                 = $OrderDetail;
+//
+//        return Theme::view('modules.order.step3',$this->_data);
+//    }
+//
+//    public function save_step3(Request $request){
+//        $validator = Validator::make($request->all(), [
+//            'id'                    => 'required'
+//        ]);
+//
+//        if ($validator->fails()) {
+//            return redirect()->back()->withErrors($validator)->withInput($request->input());
+//        }
+//
+//        $id_order                                  = $request->id;
+//
+//        if(OrderDetailModel::where('order_id',$id_order)->count() == 0){
+//            return redirect()->back()->withInput($request->input())->with('errMsg',"Please add item Order");
+//        }
+//
+//        return redirect()
+//            ->route('order_show_step4',$id_order)
+//            ->with('infoMsg',"Please Confirmation Order");
+//
+//    }
+//
+//    public function step4($id){
+//        $this->_data['state']                       = 'add';
+//        $this->_data['string_active_menu']          = 'Add/Edit';
+//        $this->_data['IDSUBMENU']                   = 'AddOrder';
+//
+//        $Users                                      = Auth::user();
+//        $Order                                      = OrderModel::find($id);
+//        $this->_data['order_id']                    = $id;
+//
+//        $this->_data['Order']                       = $Order;
+//
+//        $OrderDetail                                = OrderDetailModel::where('order_id','=',$id)->get();
+//        $this->_data['OrderDetail']                 = $OrderDetail;
+//
+//        $OrderImage                                 = OrderImageModel::where('order_id','=',$id)->get();
+//        $this->_data['OrderImage']                  = $OrderImage;
+//
+//
+//        return Theme::view('modules.order.step4',$this->_data);
+//    }
 
     public function save_laststep(Request $request){
         $validator = Validator::make($request->all(), [
@@ -906,171 +906,190 @@ class OrderController extends Controller
         $PaymentLeft                                    = set_clearFormatRupiah($request->payment_left);
         $BranchIDOrder                                  = $Users->branch_id;
 
-        // dd($request);
-        if($request->type == 1){ ## FULL PAYMENT ##
-            if($Payment < $GrandTotal){
-                return redirect()
+        if($Payment > 0 || $request->payment_type == 3){
+            // dd($request);
+            if($request->type == 1){ ## FULL PAYMENT ##
+                if($Payment < $GrandTotal){
+                    return redirect()
                         ->back()
                         ->with('errMsg','Full Payment Type is required to fill the full nominal.')
                         ->withInput($request->input());
+                }
             }
-        }
 
-        if($DiscountHeader == ""){
-            $Discount                                   = 0;
-        }else{
-            $Discount                                   = $DiscountHeader;
-        }
-
-        if($AdditionalHeader == ""){
-            $Additional                                 = 0;
-        }else{
-            $Additional                                 = $AdditionalHeader;
-        }
-
-        $Order                                          = OrderModel::find($id_order);
-        $Order->date_transaction                        = DateFormat($request->date_transaction,"Y-m-d");
-        $Order->discount                                = set_clearFormatRupiah($Discount);
-        $Order->additional                              = set_clearFormatRupiah($Additional);
-        # dp = 0, full = 1 ##
-        $Order->type                                    = $request->type;
-        if($Users->can('access-pusat')){
-            $Order->branch_id                           = $request->branch_added;
-            $BranchIDOrder                              = $request->branch_added;
-        }
-
-        if($request->type == 0){ # DP #
-            $Order->down_payment                        = set_clearFormatRupiah($Payment);
-            $Order->full_payment                        = 0;
-            $Order->invoice                             = 1;
-            # 0 = belum lunas, 1 = lunas ##
-            $Order->payment_type_id                     = $request->payment_type;
-            if($Payment >= $GrandTotal){
-                $Order->paid                            = 1; # LUNAS #
-                $Order->full_payment                    = set_clearFormatRupiah($Payment);
+            if($DiscountHeader == ""){
+                $Discount                                   = 0;
+            }else{
+                $Discount                                   = $DiscountHeader;
             }
-        }else if($request->type == 1){ ## FULL PAYMENT ##
-            $Order->down_payment                        = 0;
-            $Order->full_payment                        = set_clearFormatRupiah($Payment);
-            $Order->invoice                             = 2;
-            # 0 = belum lunas, 1 = lunas ##
-            $Order->payment_type_full_id                = $request->payment_type;
-            if($Payment >= $GrandTotal){
+
+            if($AdditionalHeader == ""){
+                $Additional                                 = 0;
+            }else{
+                $Additional                                 = $AdditionalHeader;
+            }
+
+            $Order                                          = OrderModel::find($id_order);
+            $Order->date_transaction                        = DateFormat($request->date_transaction,"Y-m-d");
+            $Order->discount                                = set_clearFormatRupiah($Discount);
+            $Order->additional                              = set_clearFormatRupiah($Additional);
+            # dp = 0, full = 1 ##
+            $Order->type                                    = $request->type;
+            if($Users->can('access-pusat')){
+                $Order->branch_id                           = $request->branch_added;
+                $BranchIDOrder                              = $request->branch_added;
+            }
+
+            if($request->type == 0){ # DP #
+                $Order->down_payment                        = set_clearFormatRupiah($Payment);
+                $Order->full_payment                        = 0;
+                $Order->invoice                             = 1;
                 # 0 = belum lunas, 1 = lunas ##
-                $Order->payment_type_full_id            = $request->payment_type;
-                $Order->paid                            = 1; # LUNAS #
-                $Order->full_payment                    = set_clearFormatRupiah($Payment);
-            }
-        }
-
-        $GrandTotal                                     = set_clearFormatRupiah($GrandTotal);
-        $Discount                                       = set_clearFormatRupiah($Discount);
-        $Additional                                     = set_clearFormatRupiah($Additional);
-        $Payment                                        = set_clearFormatRupiah($request->payment);
-        $NominalDiscount                                = $GrandTotal * $Discount / 100;
-
-
-        // $PaymentLeft                                    = $GrandTotal - $NominalDiscount + $Additional - $Payment;
-        $Order->payment_left                            = $PaymentLeft;
-
-
-        $Order->customer_id                             = $CustomerID;
-        $Order->customer_name                           = $Order->customer->name;
-
-        $Order->event_id                                = $request->event;
-
-        # 0 = proses, 1 = selesai
-        $Order->status                                  = 0;
-        if($Order->save()){
-
-            ### CASHBOOK ###
-            $CASHBOOK                                       = new CashBookModel;
-            $CASHBOOK->debit                                = $Payment;
-            $CASHBOOK->credit                               = 0;
-            $CASHBOOK->ref_id                               = $Order->id;
-            $CASHBOOK->flow                                 = "I"; // IN
-            $CASHBOOK->status                               = 1; //INCOME
-            $CASHBOOK->date_transaction                     = date('Y-m-d H:i:s');
-            $CASHBOOK->branch_id                            = $BranchIDOrder;
-            $CASHBOOK->customer_id                          = $CustomerID;
-            $CASHBOOK->flow                                 = 0; // ACTIVE //
-            $CASHBOOK->created_by                           = Auth::id();
-            $CASHBOOK->url                                  = '/order/details/';
-            $CASHBOOK->event_id                             = $request->event;
-
-
-            if($CASHBOOK->save()){
-                if($request->payment_type_full_id == 1){
-                    $CodeAccount                        = "KM";
-                }else{
-                    $CodeAccount                        = "BM";
+                $Order->payment_type_id                     = $request->payment_type;
+                if($Payment >= $GrandTotal){
+                    $Order->paid                            = 1; # LUNAS #
+                    $Order->full_payment                    = set_clearFormatRupiah($Payment);
                 }
-
-                $Notransaction                          = $CodeAccount.date("ymd").sprintf("%05s",$CASHBOOK->id);
-                $CashBookUpdate                         = CashBookModel::find($CASHBOOK->id);
-                $CashBookUpdate->notransaction          = $Notransaction;
-                $CashBookUpdate->description            = 'Transaksi dari '.$Notransaction.' oleh '.$Order->customer->name.' dengan pembayaran sebesar Rp '.number_format(set_clearFormatRupiah($Payment),0,",",".").',-';
-                if($CashBookUpdate->save()){
-                    set_SaldoBranch($BranchIDOrder,$Payment,'IN');
+            }else if($request->type == 1){ ## FULL PAYMENT ##
+                $Order->down_payment                        = 0;
+                $Order->full_payment                        = set_clearFormatRupiah($Payment);
+                $Order->invoice                             = 2;
+                # 0 = belum lunas, 1 = lunas ##
+                $Order->payment_type_full_id                = $request->payment_type;
+                if($Payment >= $GrandTotal){
+                    # 0 = belum lunas, 1 = lunas ##
+                    $Order->payment_type_full_id            = $request->payment_type;
+                    $Order->paid                            = 1; # LUNAS #
+                    $Order->full_payment                    = set_clearFormatRupiah($Payment);
                 }
             }
-            ### CASHBOOK ###
+
+            if($request->payment_type == 3){
+                $Order->paid                                = 1; # LUNAS #
+            }
+
+            $GrandTotal                                     = set_clearFormatRupiah($GrandTotal);
+            $Discount                                       = set_clearFormatRupiah($Discount);
+            $Additional                                     = set_clearFormatRupiah($Additional);
+            $Payment                                        = set_clearFormatRupiah($request->payment);
+            $NominalDiscount                                = $GrandTotal * $Discount / 100;
 
 
-            ### SEND MAIL MODE ###
-            $id                                             = $Order->id;
-            $Order                                          = OrderModel::find($id);
-            $OrderDetail                                    = OrderDetailModel::where("order_id",$id)->get();
-            $OrderImage                                     = OrderImageModel::where("order_id",$id)->get();
-            $Subtotal                                       = array();
-            foreach ($OrderDetail as $item) {
-                if($item->treatmentpackage->point > 0){
-                    set_TransactionPoint($CustomerID,$item->treatmentpackage->point,'IN');
+            // $PaymentLeft                                    = $GrandTotal - $NominalDiscount + $Additional - $Payment;
+            $Order->payment_left                            = $PaymentLeft;
+
+
+            $Order->customer_id                             = $CustomerID;
+            $Order->customer_name                           = $Order->customer->name;
+
+            $Order->event_id                                = $request->event;
+
+            # 0 = proses, 1 = selesai
+            $Order->status                                  = 0;
+            if($Order->save()){
+                if($Payment > 0 || $request->payment_type == 3){
+                    ### CASHBOOK ###
+                    $CASHBOOK                                       = new CashBookModel;
+                    $CASHBOOK->debit                                = $Payment;
+                    $CASHBOOK->credit                               = 0;
+                    $CASHBOOK->ref_id                               = $Order->id;
+                    $CASHBOOK->flow                                 = "I"; // IN
+                    $CASHBOOK->status                               = 1; //INCOME
+                    $CASHBOOK->date_transaction                     = date('Y-m-d H:i:s');
+                    $CASHBOOK->branch_id                            = $BranchIDOrder;
+                    $CASHBOOK->customer_id                          = $CustomerID;
+                    $CASHBOOK->flow                                 = 0; // ACTIVE //
+                    $CASHBOOK->created_by                           = Auth::id();
+                    $CASHBOOK->url                                  = '/order/details/';
+                    $CASHBOOK->event_id                             = $request->event;
+
+
+                    if($CASHBOOK->save()){
+                        if($request->payment_type_full_id == 1){
+                            $CodeAccount                        = "KM";
+                        }else{
+                            $CodeAccount                        = "BM";
+                        }
+
+                        $Notransaction                          = $CodeAccount.date("ymd").sprintf("%05s",$CASHBOOK->id);
+                        $CashBookUpdate                         = CashBookModel::find($CASHBOOK->id);
+                        $CashBookUpdate->notransaction          = $Notransaction;
+                        if($Payment >= $GrandTotal){
+                            $CashBookUpdate->description            = 'Transaksi Pelunasan dari '.$Order->customer->name;
+                        }else{
+                            $CashBookUpdate->description            = 'Transaksi DP dari '.$Order->customer->name.' sisa '.number_format($PaymentLeft,0,",",".");
+                        }
+                        if($request->payment_type == 3){
+                            $CashBookUpdate->description            = 'Endorse '.$Order->customer->name;
+                        }
+                        if($CashBookUpdate->save()){
+                            set_SaldoBranch($BranchIDOrder,$Payment,'IN');
+                        }
+                    }
+                    ### CASHBOOK ###
+
+
+                    ### SEND MAIL MODE ###
+                    $id                                             = $Order->id;
+                    $Order                                          = OrderModel::find($id);
+                    $OrderDetail                                    = OrderDetailModel::where("order_id",$id)->get();
+                    $OrderImage                                     = OrderImageModel::where("order_id",$id)->get();
+                    $Subtotal                                       = array();
+                    foreach ($OrderDetail as $item) {
+                        if($item->treatmentpackage->point > 0){
+                            set_TransactionPoint($CustomerID,$item->treatmentpackage->point,'IN');
+                        }
+                        $Pricex                                     = $item->price;
+                        $Discountx                                  = $item->discount;
+                        $Additionalx                                = $item->additional;
+                        $DiscountNominalx                           = $Pricex * $Discountx / 100;
+                        $Subtotals                                  = $Pricex - $DiscountNominalx + $Additionalx;
+                        array_push($Subtotal, $Subtotals);
+                    }
+                    $TotalOrderDetail                               = array_sum($Subtotal);
+                    $SumAdditional                                  = OrderDetailModel::where("order_id",$id)->sum('additional');
+
+
+                    $Attachment                                     = array();
+                    foreach($OrderImage as $image){
+                        array_push($Attachment,'images/item/'.$image->file);
+                    }
+
+                    $EmailParams                            = array(
+                        'Subject'                               => $Users->name." dari Your Bag Spa",
+                        'Views'                                 => "email.invoice",
+                        'Users'                                 => $Users,
+                        'To'                                    => $Order->customer->email,
+                        'DateNow'                               => date('d F Y'),
+                        'Order'                                 => $Order,
+                        'Discount'                              => $Order->total * $Order->discount / 100,
+                        'TotalOrderDetail'                      => $TotalOrderDetail,
+                        'OrderDetail'                           => $OrderDetail,
+                        'OrderImage'                            => $OrderImage,
+                        'attachment'                            => $Attachment
+                    );
+
+                    if($Order->customer->email){
+                        dispatch(new SendMail($EmailParams));
+                    }
+                    ### SEND MAIL MODE ###
+
+                    $data                                       = array(
+                        "scsMsg"                                => 'Invoice <strong>['.$Order->ref_number.']</strong> Succesfuly Create',
+                        "invoice"                               => route('order_invoice',$id_order)
+                    );
+                    return redirect()
+                        ->route('order_invoice',$Order->id)
+                        ->with($data);
                 }
-                $Pricex                                     = $item->price;
-                $Discountx                                  = $item->discount;
-                $Additionalx                                = $item->additional;
-                $DiscountNominalx                           = $Pricex * $Discountx / 100;
-                $Subtotals                                  = $Pricex - $DiscountNominalx + $Additionalx;
-                array_push($Subtotal, $Subtotals);
             }
-            $TotalOrderDetail                               = array_sum($Subtotal);
-            $SumAdditional                                  = OrderDetailModel::where("order_id",$id)->sum('additional');
-
-
-            $Attachment                                     = array();
-            foreach($OrderImage as $image){
-                array_push($Attachment,'images/item/'.$image->file);
-            }
-
-            $EmailParams                            = array(
-                'Subject'                               => $Users->name." dari Your Bag Spa",
-                'Views'                                 => "email.invoice",
-                'Users'                                 => $Users,
-                'To'                                    => $Order->customer->email,
-                'DateNow'                               => date('d F Y'),
-                'Order'                                 => $Order,
-                'Discount'                              => $Order->total * $Order->discount / 100,
-                'TotalOrderDetail'                      => $TotalOrderDetail,
-                'OrderDetail'                           => $OrderDetail,
-                'OrderImage'                            => $OrderImage,
-                'attachment'                            => $Attachment
-            );
-
-            if($Order->customer->email){
-                //  dispatch(new SendMail($EmailParams));
-            }
-            ### SEND MAIL MODE ###
-
-            $data                                       = array(
-                "scsMsg"                                => 'Invoice <strong>['.$Order->ref_number.']</strong> Succesfuly Create',
-                "invoice"                               => route('order_invoice',$id_order)
-            );
+        }else{
             return redirect()
-                ->route('order_invoice',$Order->id)
-                ->with($data);
-        }
+                ->back()
+                ->with('errMsg','Nominal Pembayaran harus diisi')
+                ->withInput($request->input());
 
+        }
 
     }
 
@@ -1528,7 +1547,7 @@ class OrderController extends Controller
                 $Notransaction                          = $CodeAccount.date("ymd").sprintf("%05s",$CASHBOOK->id);
                 $CashBookUpdate                         = CashBookModel::find($CASHBOOK->id);
                 $CashBookUpdate->notransaction          = $Notransaction;
-                $CashBookUpdate->description            = 'Transaksi dari '.$Notransaction.' oleh '.$Order->customer->name.' dengan pembayaran sebesar Rp '.number_format(set_clearFormatRupiah($FullPayment),0,",",".").',-';
+                $CashBookUpdate->description            = 'Transaksi Pelunasan dari '.$Order->customer->name;
                 if($CashBookUpdate->save()){
                     set_SaldoBranch($Users->branch_id,$FullPayment,'IN');
                 }
@@ -1858,7 +1877,10 @@ class OrderController extends Controller
                     'attachment'                            => '' // required
                 );
 //                dd($EmailParams);
-                dispatch(new SendMail($EmailParams));
+
+                if($EMAIL){
+                    dispatch(new SendMail($EmailParams));
+                }
 
                 $data                                    = array(
                     "status"                                => true,

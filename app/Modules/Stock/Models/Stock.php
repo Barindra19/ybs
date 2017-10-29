@@ -9,4 +9,8 @@ class Stock extends Model
     public function customer(){
         return $this->belongsTo('App\Modules\Customer\Models\CustomerModel');
     }
+
+    public function supplier(){
+        return $this->belongsTo('App\Modules\Supplier\Models\Supplier');
+    }
 }

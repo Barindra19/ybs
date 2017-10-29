@@ -5,6 +5,33 @@ $(document).ready(function() {
 $("#loadcustomer").html('');
 $("#loadbranch").html('');
 
+
+    $('#customer').select2({
+        minimumInputLength: 3,
+        ajax: {
+            url: BASE_URL + '/customer/search_autocomplete',
+            dataType: 'json',
+            type: "POST",
+            data: function (term) {
+                return {
+                    term            : term,
+                    branch_id       : $('#branch').val(),
+                    _token          : CSRF_TOKEN
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            text: item.name + " - " + item.branch,
+                            slug: item.name,
+                            id: item.id
+                        }
+                    })
+                };
+            }
+        }
+    });
     $("#branch").change( function() {
     $("#loadcustomer").html('<img alt" src="'+ IMG_SPINNER +'">');
         $.post(
@@ -20,31 +47,31 @@ $("#loadbranch").html('');
     });
 
     //CUSTOMER//
-    $("#customer").change( function() {
-    $("#loadbranch").html('<img alt" src="'+ IMG_SPINNER +'">');
-        $.post(
-            BASE_URL + '/customer/setbranch',
-        {
-            customer_id : $(this).val(),
-            _token : CSRF_TOKEN
-        },
-        function(data) {
-            var json = JSON.parse(data);
-            // console.log(json.status);
-            if(json.status == true){
-                // console.log(json.output);
-                $('#branch').val(json.output);
-                $("#loadbranch").html('');
-            }else{
-                swal({
-                        title: "Warning",
-                        text: json.output,
-                        type: "warning",
-                        showConfirmButton: "btn-warning"
-                    });
-            }
-        });
-    });
+    // $("#customer").change( function() {
+    // $("#loadbranch").html('<img alt" src="'+ IMG_SPINNER +'">');
+    //     $.post(
+    //         BASE_URL + '/customer/setbranch',
+    //     {
+    //         customer_id : $(this).val(),
+    //         _token : CSRF_TOKEN
+    //     },
+    //     function(data) {
+    //         var json = JSON.parse(data);
+    //         // console.log(json.status);
+    //         if(json.status == true){
+    //             // console.log(json.output);
+    //             $('#branch').val(json.output);
+    //             $("#loadbranch").html('');
+    //         }else{
+    //             swal({
+    //                     title: "Warning",
+    //                     text: json.output,
+    //                     type: "warning",
+    //                     showConfirmButton: "btn-warning"
+    //                 });
+    //         }
+    //     });
+    // });
     //CUSTOMER//
 
 
@@ -145,4 +172,31 @@ $("#btn-UpdateStock").click(function() {
             toastr.error(json.message);
         }
     });
+});
+
+$("#btn-AddSupplier").click(function() {
+    $('#ModalSupplier').modal('show');
+});
+
+
+$("#btn-AddSupplierNew").click(function() {
+    // $('#row-name').removeClass('has-error');
+    // $('#row-name').addClass('has-success');
+    App.startPageLoading({animate: true});
+
+    $.post(
+        BASE_URL + '/supplier/add_supplier',
+        $("#save-supplier").serialize(), function(data) {
+            var json = JSON.parse(data);
+            console.log(json);
+            if(json.status == true){
+                $('#ModalSupplier').modal('hide');
+                $("#supplier").html(json.supplier_select).show();
+                App.stopPageLoading();
+            }else{
+                $('#row-'+json.field).addClass('has-error');
+                toastr.error(json.message);
+                App.stopPageLoading();
+            }
+        });
 });

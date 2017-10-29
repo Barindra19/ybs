@@ -3,7 +3,7 @@ var FormValidation = function () {
     // FORM VALIDATION //
     var handleForm = function() {
 
-            var form = $('#form_stock');
+            var form = $('#form_Customer');
             var error = $('.alert-danger', form);
             var success = $('.alert-success', form);
 
@@ -16,55 +16,39 @@ var FormValidation = function () {
                     name: {
                         required: true
                     },
-                    cost_of_good: {
+                    address: {
                         required: true
                     },
-                    stock: {
-                        required: true
-                    },
-                    selling_price: {
-                        required: true
-                    },
-                    supplier: {
+                    // mobile: {
+                    //     required: true
+                    // },
+                    email: {
                         required: true,
-                        min: 1
+                        email:true
                     },
-                    brand: {
-                        required: true
-                    },
-                    name_of_consignment: {
-                        required: true
-                    },
-                    restock_date: {
-                        required: true
+                    branch: {
+                        required: true,
+                        min:1
                     }
 
                 },
                 message: {
                     name: {
-                        required: "Name wajib diisi"
+                        required: "Name required"
                     },
-                    cost_of_good: {
-                        required: "Modal wajib diisi"
+                    address: {
+                        required: "Address required"
                     },
-                    stock: {
-                        required: "Stock wajib diisi"
+                    // mobile: {
+                    //     required: "Mobile required"
+                    // },
+                    email: {
+                        required: "Email required",
+                        email: "Email Format is Wrong",
                     },
-                    selling_price: {
-                        required: "Harga Jual wajib diisi"
-                    },
-                    supplier: {
-                        required: "Supplier wajib diisi",
-                        min: "Supplier wajib diisi"
-                    },
-                    brand: {
-                        required: "Brand wajib diisi"
-                    },
-                    name_of_consignment: {
-                        required: "Nama Consignment wajib diisi"
-                    },
-                    restock_date: {
-                        required: "Tanggal Stock wajib diisi"
+                    branch: {
+                        required: "Branch required",
+                        min: "Branch required"
                     }
                 },
 

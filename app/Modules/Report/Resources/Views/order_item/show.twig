@@ -85,7 +85,7 @@
                           </div>
                       {% endfor %}
                   {% endif %}
-                  <form role="form" action="#" method="post" id="form_reportorder" name="form_reportorder">
+                  <form role="form" action="#" method="post" id="form_reportorderitem" name="form_reportorderitem">
 
                       <div class="row">
                             <div class="col-md-2">
@@ -97,9 +97,9 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <select class="form-control select2" name="customer" id="customer">
-                                    {% set ListCustomer = call_helpers('get_ListCustomerbyID', BranchID) %}
-                                      {% for key,value in ListCustomer %}
+                                <select class="form-control select2" name="supplier" id="supplier">
+                                    {% set ListSupplier = call_helpers('get_ListSupplier') %}
+                                      {% for key,value in ListSupplier %}
                                           <option value="{{ key }}" {{ CustomerID == key ? 'selected="selected"' : ''}}>{{ value }}</option>
                                       {% endfor %}
                                 </select>
@@ -112,15 +112,6 @@
                                 <input class="form-control" name="to" id="to" type="text" value="{% if ( state == 'WithParam') %} {{ to }} {% else %}{{ call_helpers('get_DateNow','d-m-Y') }} {% endif %}">
                                 </div>
                             </div>
-                            <div class="col-md-2">
-                                <select name="status" class="form-control select2" id="status">
-                                    {% set ListChangedStatus = call_helpers('get_ListChangedStatus') %}
-                                          <option value="">Pilih Status</option>
-                                          {% for key,value in ListChangedStatus %}
-                                              <option value="{{ key }}" {{ Status == key ? 'selected="selected"' : ''}}>{{ value }}</option>
-                                      {% endfor %}
-                                </select>
-                            </div>
                             <div class="col-md-1">
                                 <div class="btn-group">
                                     <a class="btn green" href="javascript:;" data-toggle="dropdown" aria-expanded="true">
@@ -129,15 +120,15 @@
                                     </a>
                                     <ul class="dropdown-menu">
                                         <li>
-                                            <a href="javascript:void(0);" id="a-ShowReportOrder">
+                                            <a href="javascript:void(0);" id="a-ShowReport">
                                                 <i class="fa fa-file-text"></i> Tampilkan </a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);" id="a-ExcelReportOrder">
+                                            <a href="javascript:void(0);" id="a-ExcelReport">
                                                 <i class="fa fa-file-excel-o"></i> EXCEL </a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);" id="a-PDFReportOrder">
+                                            <a href="javascript:void(0);" id="a-PDFReport">
                                                 <i class="fa fa-file-pdf-o"></i> PDF </a>
                                         </li>
                                     </ul>
@@ -156,44 +147,39 @@
                               <thead>
                                   <tr>
                                       <th>Code</th>
-                                      <th>Customer</th>
-                                      <th>Tanggal</th>
-                                      <th>Tagihan</th>
-                                      <th>DP</th>
-                                      <th>Pelunasan</th>
-                                      <th>Sisa</th>
-                                      <th>Status</th>
+                                      <th>Tanggal Transaksi</th>
+                                      <th>Produk</th>
+                                      <th>Harga</th>
+                                      <th>Jumlah</th>
+                                      <th>Discount</th>
+                                      <th>Additional</th>
+                                      <th>Total</th>
                                   </tr>
                               </thead>
                               <!--tbody section is required-->
                               <tbody>
                                   {% if (ResultOrder) %}
                                   {% for item in ResultOrder %}
-                                  <tr>
-                                      <td>{{ item.ref_number }}</td>
-                                      <td>{{ item.customer.name }}</td>
-                                      <td>{{ call_helpers_two('DateFormat', item.date_transaction ,"d/m/Y H:i:s" ) }}</td>
-                                      <td align="right"><span class="label label-sm label-danger">{{ call_helpers('set_numberformat',item.total) }}</span></td>
-                                      <td align="right"><span class="label label-sm label-success">{{ call_helpers('set_numberformat',item.down_payment) }}</span></td>
-                                      <td align="right"><span class="label label-sm label-success">{{ call_helpers('set_numberformat',item.full_payment) }}</span></td>
-                                      {% set Sisa = call_helpers('set_numberformat',item.total - item.down_payment - item.full_payment) %}
-                                      <td align="right">
-                                          {% if (Sisa > 0) %}
-                                                <span class="label label-sm label-danger">{{ Sisa }}</span>
-                                          {% else %}
-                                                <span class="label label-sm label-info">{{ Sisa }}</span>
-                                          {% endif %}
-                                      </td>
-                                      <td>
-                                          {% if (item.status == 6) %}
-                                          <span class="label label-sm label-info">{{ call_helpers('get_statusorder',item.status) }}</span>
-                                          {% else %}
-                                          <span class="label label-sm label-warning">{{ call_helpers('get_statusorder',item.status) }}</span>
-                                          {% endif %}
-                                        </td>
-                                  </tr>
+                                    {% for detail in item.order_item_detail %}
+                                      <tr>
+                                          <td>{{ item.ref_number }}</td>
+                                          <td>{{ call_helpers_two('DateFormat', item.date_transaction ,"d/m/Y H:i:s" ) }}</td>
+                                          <td>{{ detail.stock.name }}</td>
+                                          <td align="right"><span class="label label-sm label-success">{{ call_helpers('set_numberformat',detail.price) }}</span></td>
+                                          <td align="right"><span class="label label-sm label-info">{{ call_helpers('set_numberformat',detail.quantity) }} pcs</span></td>
+                                          <td align="right"><span class="label label-sm label-danger">{{ call_helpers('set_numberformat',detail.price - (detail.price*detail.discount/100)) }}</span></td>
+                                          <td align="right"><span class="label label-sm label-success">{{ call_helpers('set_numberformat',detail.additional) }}</span></td>
+                                          <td align="right">
+                                                <span class="label label-sm label-danger">{{ detail.total | number_format(0,",",".") }}</span>
+                                          </td>
+                                    </tr>
+                                        {% endfor %}
                                   {% endfor %}
                                   {% endif %}
+                                    <tr>
+                                        <th colspan="7">TOTAL</th>
+                                        <td align="right"><span class="label label-sm label-danger">{{ Total | number_format(0,",",".") }}</span></td>
+                                    </tr>
                               </tbody>
                           </table>
 
@@ -265,7 +251,7 @@
 
 
 <!-- JS -->
-{{ asset('modules/order/main.js')|script_tag }}
+{{ asset('modules/report/order/item/main.js')|script_tag }}
 
 
 {% endblock %}

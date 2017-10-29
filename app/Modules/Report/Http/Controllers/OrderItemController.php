@@ -7,15 +7,12 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
-use Illuminate\Support\Facades\Validator;
-
 use App\Modules\Role\Models\Role;
 use App\Modules\User\Models\UserModel;
 use App\Modules\Customer\Models\CustomerModel;
 use App\Modules\Branch\Models\BranchModel;
-use App\Modules\Order\Models\OrderModel;
-use App\Modules\Order\Models\OrderDetailModel;
-use App\Modules\Order\Models\OrderImageModel;
+use App\Modules\Order\Models\OrderItemModel;
+use App\Modules\Order\Models\OrderItemDetailModel;
 use App\User;
 
 use App\Jobs\SendMail;
@@ -28,39 +25,37 @@ use Activity;
 use Excel;
 use PDF;
 
-class OrderController extends Controller
+class OrderItemController extends Controller
 {
 
     protected $_data = array();
     public function __construct()
     {
         $this->middleware(['permission:report-menu']);
-        $this->middleware(['permission:report-order-view']);
+        $this->middleware(['permission:report-orderitem-view']);
 
         $this->_data['string_menuname']             = 'Report';
     }
 
     public function index(){
-        $this->_data['string_active_menu']          = 'Order';
+        $this->_data['string_active_menu']          = 'Order Item';
 
-        return Theme::view('modules.report.order.show',$this->_data);
+        return Theme::view('modules.report.order_item.show',$this->_data);
     }
 
     public function show(){
-        $this->_data['string_active_menu']          = 'Order';
-        $this->_data['IDSUBMENU']                   = 'OrderTransaction';
+        $this->_data['string_active_menu']          = 'Order Item';
 
-        return Theme::view('modules.report.order.show',$this->_data);
+        return Theme::view('modules.report.order_item.show',$this->_data);
     }
 
     public function retrieve($get){
         $Get                                        = explode(" | ",base64_decode($get));
         $BranchID                                   = $Get[0];
-        $CustomerID                                 = $Get[1];
+        $SupplierID                                 = $Get[1];
         $From                                       = DateFormat($Get[2],"Y-m-d 00:00:00");
         $To                                         = DateFormat($Get[3],"Y-m-d 23:59:59");
-        $Status                                     = $Get[4];
-        $Action                                     = $Get[5];
+        $Action                                     = $Get[4];
 
         $Users                                      = Auth::user();
         $Where                                      = array();
@@ -79,68 +74,37 @@ class OrderController extends Controller
             $Branch                                     = $Users->branch_id;
         }
 
-        if($CustomerID > 0){
-            $Where['customer_id']                   = $CustomerID;
+        if($SupplierID > 0){
+            $Where['supplier_id']                       = $SupplierID;
         }
 
-        if($Status > 0){
-            $Where['status']                        = $Status;
-        }
-
-        $OrderInfo                                  = OrderModel::where($Where)
+        $OrderInfo                                  = OrderItemModel::where($Where)
                                                                 ->where('date_transaction',">=",$From)
                                                                 ->where('date_transaction',"<=",$To)
-                                                                ->where('invoice',">",0)
+                                                                ->where('status',"=",1)
                                                                 ->get();
 
-        $SumDownPayment                             = OrderModel::where($Where)
+        $Total                                      = OrderItemModel::where($Where)
                                                                 ->where('date_transaction',">=",$From)
                                                                 ->where('date_transaction',"<=",$To)
-                                                                ->where('invoice',">",0)
-                                                                ->sum('down_payment');
-
-        $SumFullPayment                             = OrderModel::where($Where)
-                                                                ->where('date_transaction',">=",$From)
-                                                                ->where('date_transaction',"<=",$To)
-                                                                ->where('invoice',">",0)
-                                                                ->sum('full_payment');
-
-
-        $SumTotal                                   = OrderModel::where($Where)
-                                                                ->where('date_transaction',">=",$From)
-                                                                ->where('date_transaction',"<=",$To)
-                                                                ->where('invoice',">",0)
-                                                                ->sum('total');
+                                                                ->where('status',"=",1)
+                                                                ->sum('payment');
         $BranchInfo                                 = BranchModel::find($Branch);
         $Percentage                                 = $BranchInfo->persentage;
 
-        $ArrHarga                                   = array();
-        $ArrKomisi                                  = array();
-        $ArrTotal                                   = array();
-        foreach($OrderInfo as $Info){
-            $DetailItem                             = get_OrderDetailbyID($Info->id);
-            foreach($DetailItem as $item){
-
-                $Komisi                             = $BranchInfo->persentage * $item->total/100;
-                $Tagihan                            = $item->total - $Komisi;
-                array_push($ArrKomisi,$Komisi);
-                array_push($ArrHarga,$item->total);
-                array_push($ArrTotal,$Tagihan);
-            }
-        }
-
         $this->_data['ResultOrder']                 = $OrderInfo;
         $this->_data['BranchID']                    = $BranchID;
-        $this->_data['CustomerID']                  = $CustomerID;
+        $this->_data['SupplierID']                  = $SupplierID;
+        $this->_data['Total']                       = $Total;
+
         $this->_data['from']                        = DateFormat($From,"d-m-Y");
         $this->_data['to']                          = DateFormat($To,"d-m-Y");
-        $this->_data['Status']                      = $Status;
         $this->_data['state']                       = 'WithParam';
 
         ### EXCEL ###
         if($Action == 'excel'){
             $data = array(
-                array('No.','Tanggal', 'Customer','Code','Treatment','Kategori','Status')
+                array('No.','Code','Tanggal', 'Produk','Harga','Jumlah','Discount','Additional','Total')
             );
 
             $Info           = array();
@@ -148,40 +112,31 @@ class OrderController extends Controller
             $ArrTotal       = array();
             $x              = 1;
             foreach($OrderInfo as $item){
-                $OrderDetail                    = OrderDetailModel::where('order_id',$item->id)->get();
-                foreach($OrderDetail as $detail){
-                    if($detail->treatment_category_id){
-                        $Kategori                = $detail->treatmentcategory->name;
-                    }else{
-                        $Kategori                = "-";
-                    }
-                $Komisi                         = $detail->total * $Percentage/100;
+                foreach($item->order_item_detail as $detail){
+
                 $Info[$i][0]                    = $x; //No.
-                $Info[$i][1]                    = DateFormat($item->date_transaction,"d-m-Y"); //Tanggal
-                $Info[$i][2]                    = $item->customer->name; //Customer
-                $Info[$i][3]                    = $item->ref_number; // Code
-                $Info[$i][4]                    = $detail->treatmentpackage->name; // Treatment
-                $Info[$i][5]                    = $Kategori; //Kategori
-                $Info[$i][6]                    = $detail->merk_name; //Brand
-                $Info[$i][7]                    = $detail->total; //Harga
-                $Info[$i][8]                    = $Komisi; //Komisi
-                $Info[$i][9]                    = $detail->total - $Komisi; //Tagihan
+                $Info[$i][1]                    = $item->ref_number; // Code
+                $Info[$i][2]                    = DateFormat($item->date_transaction,"d-m-Y"); //Tanggal
+                $Info[$i][3]                    = $detail->stock->name; //Stock
+                $Info[$i][4]                    = $detail->price; // PRICE
+                $Info[$i][5]                    = $detail->quantity; //QTY
+                $Info[$i][6]                    = $detail->price - ($detail->price * $detail->discount/100); //Discount
+                $Info[$i][7]                    = $detail->additional; //ADDITIONAL
+                $Info[$i][8]                    = $detail->total; //TOTAL
                 $i++;
                 $x++;
                 }
             }
             $BranchInfo                             = BranchModel::find($Branch);
-            $Total                                  = array_sum($ArrTotal);
             $Info[$i][0]                            = "";
             $Info[$i][1]                            = "";
             $Info[$i][2]                            = "";
             $Info[$i][3]                            = "";
             $Info[$i][4]                            = "";
             $Info[$i][5]                            = "";
-            $Info[$i][6]                            = "Total";
-            $Info[$i][7]                            = array_sum($ArrHarga);
-            $Info[$i][8]                            = array_sum($ArrKomisi);
-            $Info[$i][9]                            = array_sum($ArrTotal);
+            $Info[$i][6]                            = "";
+            $Info[$i][7]                            = "Total";
+            $Info[$i][8]                            = $Total;
             $i = $i + $i;
             $Info[$i][0]                            = "";
             $Info[$i][1]                            = "";
@@ -190,9 +145,8 @@ class OrderController extends Controller
             $Info[$i][4]                            = "";
             $Info[$i][5]                            = "";
             $Info[$i][6]                            = "";
-            $Info[$i][7]                            = "";
-            $Info[$i][8]                            = $BranchInfo->city.", ".date('d F Y');
-            $Info[$i][9]                            = "";
+            $Info[$i][7]                            = $BranchInfo->city.", ".date('d F Y');
+            $Info[$i][8]                            = "";
 
             $BranchData                         = array(
                 "name"                          => $BranchInfo->name,
@@ -200,7 +154,7 @@ class OrderController extends Controller
                 "phone"                         => $BranchInfo->phone
             );
 
-            Excel::create('Order'.DateFormat($From,'dmy')."_".DateFormat($To,"dmy"), function($excel) use($Info,$data,$BranchData) {
+            Excel::create('OrderItem'.DateFormat($From,'dmy')."_".DateFormat($To,"dmy"), function($excel) use($Info,$data,$BranchData) {
 
                 $excel->sheet('Report Order', function($sheet) use($Info,$data,$BranchData) {
 
@@ -225,24 +179,6 @@ class OrderController extends Controller
                         ));
                     });
                     $sheet->cell('C4', function($cell) {
-                        $cell->setValue('Tanggal');
-                        $cell->setBackground('#36c6d3');
-                        $cell->setFont(array(
-                            'family'     => 'Calibri',
-                            'size'       => '12',
-                            'bold'       =>  true
-                        ));
-                    });
-                    $sheet->cell('D4', function($cell) {
-                        $cell->setValue('Customer');
-                        $cell->setBackground('#36c6d3');
-                        $cell->setFont(array(
-                            'family'     => 'Calibri',
-                            'size'       => '12',
-                            'bold'       =>  true
-                        ));
-                    });
-                    $sheet->cell('E4', function($cell) {
                         $cell->setValue('Code');
                         $cell->setBackground('#36c6d3');
                         $cell->setFont(array(
@@ -251,8 +187,26 @@ class OrderController extends Controller
                             'bold'       =>  true
                         ));
                     });
+                    $sheet->cell('D4', function($cell) {
+                        $cell->setValue('Tanggal Transaksi');
+                        $cell->setBackground('#36c6d3');
+                        $cell->setFont(array(
+                            'family'     => 'Calibri',
+                            'size'       => '12',
+                            'bold'       =>  true
+                        ));
+                    });
+                    $sheet->cell('E4', function($cell) {
+                        $cell->setValue('Produk');
+                        $cell->setBackground('#36c6d3');
+                        $cell->setFont(array(
+                            'family'     => 'Calibri',
+                            'size'       => '12',
+                            'bold'       =>  true
+                        ));
+                    });
                     $sheet->cell('F4', function($cell) {
-                        $cell->setValue('Treatment');
+                        $cell->setValue('Harga');
                         $cell->setBackground('#36c6d3');
                         $cell->setFont(array(
                             'family'     => 'Calibri',
@@ -261,7 +215,7 @@ class OrderController extends Controller
                         ));
                     });
                     $sheet->cell('G4', function($cell) {
-                        $cell->setValue('Kategori');
+                        $cell->setValue('Jumlah');
                         $cell->setBackground('#36c6d3');
                         $cell->setFont(array(
                             'family'     => 'Calibri',
@@ -270,7 +224,7 @@ class OrderController extends Controller
                         ));
                     });
                     $sheet->cell('H4', function($cell) {
-                        $cell->setValue('Brand');
+                        $cell->setValue('Discount');
                         $cell->setBackground('#36c6d3');
                         $cell->setFont(array(
                             'family'     => 'Calibri',
@@ -279,7 +233,7 @@ class OrderController extends Controller
                         ));
                     });
                     $sheet->cell('I4', function($cell) {
-                        $cell->setValue('Harga');
+                        $cell->setValue('Additional');
                         $cell->setBackground('#36c6d3');
                         $cell->setFont(array(
                             'family'     => 'Calibri',
@@ -289,7 +243,7 @@ class OrderController extends Controller
                     });
 
                     $sheet->cell('J4', function($cell) {
-                        $cell->setValue('Komisi');
+                        $cell->setValue('Total');
                         $cell->setBackground('#36c6d3');
                         $cell->setFont(array(
                             'family'     => 'Calibri',
@@ -298,15 +252,7 @@ class OrderController extends Controller
                         ));
                     });
 
-                    $sheet->cell('K4', function($cell) {
-                        $cell->setValue('Tagihan');
-                        $cell->setBackground('#36c6d3');
-                        $cell->setFont(array(
-                            'family'     => 'Calibri',
-                            'size'       => '12',
-                            'bold'       =>  true
-                        ));
-                    });
+
                     // // HEADER //
                     // $sheet->fromArray($Info);
                     $i = 5;
@@ -320,7 +266,6 @@ class OrderController extends Controller
                         $sheet->cell('H'.$i, $d[6]);
                         $sheet->cell('i'.$i, $d[7]);
                         $sheet->cell('j'.$i, $d[8]);
-                        $sheet->cell('k'.$i, $d[9]);
                         $i++;
                     }
 
@@ -338,9 +283,6 @@ class OrderController extends Controller
             $DateExpirate                   = date("d F Y",$date);
 
             $data['ResultOrder']            = $OrderInfo;
-            $data['SumHarga']               = array_sum($ArrHarga);
-            $data['SumKomisi']              = array_sum($ArrKomisi);
-            $data['SumTotal']               = array_sum($ArrTotal);
             $data['Branch']                 = $BranchInfo;
             $data['Users']                  = $Users;
             $data['persentage']             = $BranchInfo->persentage;
@@ -348,12 +290,13 @@ class OrderController extends Controller
             $data['JatuhTempo']             = $DateExpirate;
 
 
-            $pdf = PDF::loadView('pdf.order', $data)->setPaper('a4', 'landscape');
-            return $pdf->download('order.pdf');
+            $pdf = PDF::loadView('pdf.order_item', $data)->setPaper('a4', 'landscape');
+            return $pdf->download('order_item.pdf');
         }
 
-        return Theme::view('modules.report.order.show',$this->_data);
+        return Theme::view('modules.report.order_item.show',$this->_data);
 
     }
+
 
 }

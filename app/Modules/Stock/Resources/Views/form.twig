@@ -175,80 +175,103 @@
                       </div>
                       <!-- END NAMA CONSIGNMENT -->
 
-                      <!-- PHONE -->
-                      <div class="form-group {% if (errors.has('phone')) %}has-error{% endif %}">
-                              <label class="control-label col-md-3">Phone
-                              </label>
-                          <div class="col-md-6">
-                                <div class="input-icon right">
-                                    <i class="fa fa-phone"></i>
-                                    <input type="text" class="form-control" id="phone" name="phone" placeholder="Example : 025183121xx" autocomplete="off" value="{% if state == 'add' %}{{ old('phone') }}{% else %}{{ Stock.phone }}{% endif %}">
-                                    {% if (errors.has('phone')) %}<span class="help-block"> {{ errors.first('phone') }} </span>{% endif %}
-                                </div>
-                         </div>
+
+                      <!-- SUPPLIER -->
+                      <div class="form-group {% if (errors.has('supplier')) %}has-error{% endif %}">
+                          <label class="control-label col-md-3">Supplier
+                            <span class="required"> * </span>
+                          </label>
+                          <div class="col-md-4">
+                              <div class="input-icon right">
+                              <i class="fa"></i>
+                              <select name="supplier" class="form-control select2" id="supplier">
+                              {% set ListSupplier = call_helpers('get_ListSupplier') %}
+                                {% for key,value in ListSupplier %}
+                                 <option value="{{ key }}" {{ Stock.supplier_id == key ? 'selected="selected"' : ''}}>{{ value }}</option>
+                                 {% endfor %}
+                              </select>
+                              {% if (errors.has('branch')) %}<span class="help-block"> {{ errors.first('supplier') }} </span>{% endif %}
+                              </div>
+                          </div>
+                          <div class="col-md-1">
+                              <button type="button" class="btn btn-success" name="btn-AddSupplier" id="btn-AddSupplier" value="AddSupplier"><i class="fa fa-plus-circle"></i> New</button>
+                          </div>
+
                       </div>
+                      <!-- END SUPPLIER -->
+
+                      <!-- PHONE -->
+                      {#<div class="form-group {% if (errors.has('phone')) %}has-error{% endif %}">#}
+                              {#<label class="control-label col-md-3">Phone#}
+                              {#</label>#}
+                          {#<div class="col-md-6">#}
+                                {#<div class="input-icon right">#}
+                                    {#<i class="fa fa-phone"></i>#}
+                                    {#<input type="text" class="form-control" id="phone" name="phone" placeholder="Example : 025183121xx" autocomplete="off" value="{% if state == 'add' %}{{ old('phone') }}{% else %}{{ Stock.phone }}{% endif %}">#}
+                                    {#{% if (errors.has('phone')) %}<span class="help-block"> {{ errors.first('phone') }} </span>{% endif %}#}
+                                {#</div>#}
+                         {#</div>#}
+                      {#</div>#}
                       <!-- END PHONE -->
 
                       <!-- REKENING -->
-                      <div class="form-group {% if (errors.has('rekening')) %}has-error{% endif %}">
-                              <label class="control-label col-md-3">Rekening
-                              </label>
-                          <div class="col-md-6">
-                                <div class="input-icon right">
-                                    <i class="fa fa-bank"></i>
-                                    <input type="text" class="form-control" id="rekening" name="rekening" placeholder="Example : BCA an Barindra 738031xxxx" autocomplete="off" value="{% if state == 'add' %}{{ old('rekening') }}{% else %}{{ Stock.rekening }}{% endif %}">
-                                    {% if (errors.has('rekening')) %}<span class="help-block"> {{ errors.first('rekening') }} </span>{% endif %}
-                                </div>
-                         </div>
-                      </div>
+                      {#<div class="form-group {% if (errors.has('rekening')) %}has-error{% endif %}">#}
+                              {#<label class="control-label col-md-3">Rekening#}
+                              {#</label>#}
+                          {#<div class="col-md-6">#}
+                                {#<div class="input-icon right">#}
+                                    {#<i class="fa fa-bank"></i>#}
+                                    {#<input type="text" class="form-control" id="rekening" name="rekening" placeholder="Example : BCA an Barindra 738031xxxx" autocomplete="off" value="{% if state == 'add' %}{{ old('rekening') }}{% else %}{{ Stock.rekening }}{% endif %}">#}
+                                    {#{% if (errors.has('rekening')) %}<span class="help-block"> {{ errors.first('rekening') }} </span>{% endif %}#}
+                                {#</div>#}
+                         {#</div>#}
+                      {#</div>#}
                       <!-- END REKENING -->
 
-                        <!-- BRANCH -->
-                        <div class="form-group {% if (errors.has('branch')) %}has-error{% endif %}">
-                            <label class="control-label col-md-3">Branch
-                                <span class="required"> * </span>
-                            </label>
-                            <div class="col-md-4">
-                              <div class="input-icon right">
-                                  <i class="fa"></i>
-                                  <select name="branch" class="form-control select2" id="branch" {% if state == 'edit' %}disabled{% endif %}>
-                                      {% set ListBranch = call_helpers('get_ListBranch') %}
-                                            {% for key,value in ListBranch %}
-                                                <option value="{{ key }}" {{ BranchID == key ? 'selected="selected"' : ''}}>{{ value }}</option>
-                                            {% endfor %}
-                                  </select>
-                                  {% if (errors.has('branch')) %}<span class="help-block"> {{ errors.first('branch') }} </span>{% endif %}
-                              </div>
-                               </div>
-                        </div>
-                        <!-- END BRANCH -->
+                      {#<!-- BRANCH -->#}
+                      {#<div class="form-group {% if (errors.has('branch')) %}has-error{% endif %}">#}
+                          {#<label class="control-label col-md-3">Branch#}
+                              {#<span class="required"> * </span>#}
+                          {#</label>#}
+                          {#<div class="col-md-4">#}
+                              {#<div class="input-icon right">#}
+                                  {#<i class="fa"></i>#}
+                                  {#<select name="branch" class="form-control select2" id="branch">#}
+                                      {#{% set ListBranch = call_helpers('get_ListBranch') %}#}
+                                      {#{% for key,value in ListBranch %}#}
+                                          {#<option value="{{ key }}" {{ BranchID == key ? 'selected="selected"' : ''}}>{{ value }}</option>#}
+                                      {#{% endfor %}#}
+                                  {#</select>#}
+                                  {#<span class="help-block">Pilih customer dari branch</span>#}
+                                  {#{% if (errors.has('branch')) %}<span class="help-block"> {{ errors.first('branch') }} </span>{% endif %}#}
+                              {#</div>#}
+                          {#</div>#}
+                      {#</div>#}
+                      {#<!-- END BRANCH -->#}
 
-                        <!-- CUSTOMER -->
-                        <div class="form-group {% if (errors.has('customer')) %}has-error{% endif %}">
-                            <label class="control-label col-md-3">Supplier
-                                <span class="required"> * </span>
-                            </label>
-                            <div class="col-md-4">
-                              <div class="input-icon right">
-                                  <i class="fa"></i>
-                                  <select class="form-control select2" name="customer" id="customer" {% if state == 'edit' %}disabled{% endif %}>
-                                      {% set ListCustomer = call_helpers('get_ListCustomerbyID', BranchID) %}
-                                        {% for key,value in ListCustomer %}
-                                            <option value="{{ key }}" {{ Stock.customer_id == key ? 'selected="selected"' : ''}}>{{ value }}</option>
-                                        {% endfor %}
-                                  </select>
-                                  <div id="loadcustomer">&nbsp;</div>
-                                  {% if (errors.has('customer')) %}<span class="help-block"> {{ errors.first('customer') }} </span>{% endif %}
-                                  {% if state == 'edit' %}
-                                    <input type="hidden" name="customer" value="{{ Stock.customer_id }}" id="customer">
-                                  {% endif %}
-                              </div>
-                           </div>
-                           <div class="col-md-1">
-                               <button type="button" class="btn btn-warning" name="btn-SearchCustomer" id="btn-SearchCustomer" value="SearchCustomer"><i class="glyphicon glyphicon-search"></i> Search</button>
-                           </div>
-                        </div>
-                        <!-- END CUSTOMER -->
+
+                      {#<!-- CUSTOMER -->#}
+                      {#<div class="form-group {% if (errors.has('customer')) %}has-error{% endif %}">#}
+                          {#<label class="control-label col-md-3">Customer#}
+                              {#<span class="required"> * </span>#}
+                          {#</label>#}
+                          {#<div class="col-md-4">#}
+                              {#<div class="input-icon right">#}
+                                  {#<i class="fa"></i>#}
+                                  {#<select class="form-control" name="customer" id="customer">#}
+                                  {#</select>#}
+                                  {#<div id="loadcustomer">&nbsp;</div>#}
+                                  {#{% if (errors.has('customer')) %}<span class="help-block"> {{ errors.first('customer') }} </span>{% endif %}#}
+                              {#</div>#}
+                          {#</div>#}
+                          {#<div class="col-md-1">#}
+                              {#<button type="button" class="btn btn-warning" name="btn-SearchCustomer" id="btn-SearchCustomer" value="SearchCustomer"><i class="glyphicon glyphicon-search"></i> Search</button>#}
+                          {#</div>#}
+                          {#<div class="col-md-1">#}
+                              {#<button type="button" class="btn btn-success" name="btn-AddCustomer" id="btn-AddCustomer" value="AddCustomer"><i class="fa fa-plus-circle"></i> New</button>#}
+                          {#</div>#}
+                      {#</div>#}
+                      {#<!-- END CUSTOMER -->#}
 
                       <!-- POINT  -->
                       <div class="form-group {% if (errors.has('point')) %}has-error{% endif %}">
@@ -294,10 +317,112 @@
       </div>
   </div>
 </div>
+{% endblock %}
+
+
+{% block addmodal %}
+    <!-- ADD SUPPLIER -->
+    <div class="modal fade" id="ModalSupplier" role="dialog" tabindex="1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Add New Supplier</h4>
+                </div>
+                <div class="modal-body">
+                    <!-- BEGIN FORM-->
+                    <form class="form-horizontal" name="save-supplier" id="save-supplier">
+                        {{ csrf_field() }}
+                        <div class="form-body">
+
+                            <!-- NAME -->
+                            <div class="form-group" id="row-name">
+                                <label class="control-label col-md-3">Name
+                                    <span class="required"> * </span>
+                                </label>
+                                <div class="col-md-6">
+                                    <div class="input-icon right">
+                                        <i class="fa"></i>
+                                        <input type="text" class="form-control" id="name" name="name" placeholder="Name" autocomplete="off" value="{% if state == 'add' %}{{ old('name') }}{% else %}{{ Supplier.name }}{% endif %}">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END NAME -->
+
+                            <!-- ADDRESS -->
+                            <div class="form-group">
+                                <label class="control-label col-md-3">Address
+                                </label>
+                                <div class="col-md-6">
+                                    <div class="input-icon right">
+                                        <i class="fa fa-building"></i>
+                                        <textarea class="form-control" id="address" name="address" placeholder="Customer Address">{% if state == 'add' %}{{ old('address') }}{% else %}{{ Supplier.address }}{% endif %}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END ADDRESS -->
+
+                            <!-- PHONE -->
+                            <div class="form-group">
+                                <label class="control-label col-md-3">Phone
+                                </label>
+                                <div class="col-md-6">
+                                    <div class="input-icon right">
+                                        <i class="fa fa-phone"></i>
+                                        <input type="text" class="form-control" id="phone" name="phone" placeholder="Example : 025183121xx" autocomplete="off" value="{% if state == 'add' %}{{ old('phone') }}{% else %}{{ Supplier.phone }}{% endif %}">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END PHONE -->
+
+                            <!-- BANK -->
+                            <div class="form-group">
+                                <label class="control-label col-md-3">Bank
+                                </label>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" id="bank" name="bank" placeholder="bank" autocomplete="off" value="{% if state == 'add' %}{{ old('bank') }}{% else %}{{ Supplier.bank }}{% endif %}">
+                                </div>
+                            </div>
+                            <!-- END BANK -->
+
+                            <!-- ACCOUNT BANK -->
+                            <div class="form-group">
+                                <label class="control-label col-md-3">No. Rekening
+                                </label>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" id="account_bank" name="account_bank" placeholder="No. Rekenng" autocomplete="off" value="{% if state == 'add' %}{{ old('account_bank') }}{% else %}{{ Supplier.account_bank }}{% endif %}">
+                                </div>
+                            </div>
+                            <!-- END ACCOUNT BANK -->
+
+                            <!-- NOTE -->
+                            <div class="form-group">
+                                <label class="control-label col-md-3">Keterangan
+                                </label>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" id="note" name="note" placeholder="Keterangan" autocomplete="off" value="{% if state == 'add' %}{{ old('note') }}{% else %}{{ Supplier.note }}{% endif %}">
+                                </div>
+                            </div>
+                            <!-- END NOTE -->
+
+
+                        </div>
+                    </form>
+                    <!-- END FORM-->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn dark btn-outline btn-circle" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger mt-ladda-btn ladda-button btn-circle" id="btn-AddSupplierNew">Add</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- ADD SUPPLIER  -->
 
 
 {% endblock %}
-
 
 {% block addjs %}
 <script>

@@ -219,7 +219,88 @@
                     </div>
                 </div>
             </div>
-
+        {% elseif call_helpers('bool_CheckUserRole','kepala-cabang') %}
+        <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                <div class="dashboard-stat2 ">
+                    <div class="display">
+                        <div class="number">
+                            <h3 class="font-green-sharp">
+                                <small class="font-green-sharp">Rp</small>
+                                <span data-counter="counterup" data-value="{{ TransactionDebitTodayInMyBranch }}">0</span>
+                            </h3>
+                            <small>TOTAL INCOME</small>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-money"></i>
+                        </div>
+                    </div>
+                    <div class="progress-info">
+                        <div class="status">
+                            <div class="status-title"> {{ Branch }} </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                <div class="dashboard-stat2 ">
+                    <div class="display">
+                        <div class="number">
+                            <h3 class="font-red-haze">
+                                <span data-counter="counterup" data-value="{{ CountTransactionInBranchToday }}">0</span>
+                            </h3>
+                            <small>TOTAL TRANSACTION</small>
+                        </div>
+                        <div class="icon">
+                            <i class="icon-basket"></i>
+                        </div>
+                    </div>
+                    <div class="progress-info">
+                        <div class="status">
+                            <div class="status-title"> On {{ call_helpers('get_DateNow','l, d F Y') }} </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                <div class="dashboard-stat2 ">
+                    <div class="display">
+                        <div class="number">
+                            <h3 class="font-blue-sharp">
+                                <span data-counter="counterup" data-value="{{ CountNewCustomerTodayInBranch }}">0</span>
+                            </h3>
+                            <small>NEW CUSTOMER</small>
+                        </div>
+                        <div class="icon">
+                            <i class="icon-user"></i>
+                        </div>
+                    </div>
+                    <div class="progress-info">
+                        <div class="status">
+                            <div class="status-title"> Yesterday </div>
+                            <div class="status-number"> {{ CountNewCustomerYesterdayInBranch }} customer</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 col-xs-12 col-sm-12">
+                <div class="portlet light ">
+                    <div class="portlet-title">
+                        <div class="caption ">
+                            <span class="caption-subject font-dark bold uppercase">Transaction</span>
+                            <span class="caption-helper">{{ Branch }}</span>
+                        </div>
+                        <div class="actions">
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <div id="dashboard_amchart_3" class="CSSAnimationChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endif %}
     {% elseif call_helpers('bool_CheckUserRole','customer') == TRUE %}
         <div class="row">

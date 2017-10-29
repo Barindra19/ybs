@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Report Order</title>
+    <style>
+        .font-value{
+            font-size: 12px;
+        }
+        .font-value-bold{
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .font-detail-value{
+            font-size: 9px;
+        }
+        .td-left-none{
+            border-left-style: none;
+        }
+
+    </style>
+</head>
+
+<body>
+<div>
+    <table width="700" border="0">
+        <tr>
+            <td>
+                <table cellspacing="3" cellpadding="3" border="0" width="300">
+                    <tr>
+                        <td rowspan="4" width="100px">
+                            <img src="{{ asset('images/logo/yourbag.png') }}" class="img img-responsive" style="max-height:80px;">
+                        </td>
+                        <td width="150px"><strong>{{ Users.branch.name }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td width="150px">{{ Users.branch.address | raw }}</td>
+                    </tr>
+                    <tr>
+                        <td width="150px">{{ Users.branch.phone }}</td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table>
+                    <tr>
+                        <td>No. Invoice :</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Kepada : </td>
+                        <td>{{ Branch.name }}</td>
+                    </tr>
+                    <tr>
+                        <td>Tanggal</td>
+                        <td>{{ Tanggal }}</td>
+                    </tr>
+                    <tr>
+                        <td>Jatuh Tempo</td>
+                        <td>{{ JatuhTempo }}</td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+
+</div>
+<div>
+    <table border="1" style="border-collapse:collapse;" cellpadding="3" cellspacing="3">
+        <thead>
+        <tr>
+            <th align="center" width="10px;">No.</th>
+            <th align="center" width="100px;">Code</th>
+            <th align="center" width="120px;">Tgl. Transaksi</th>
+            <th align="center" width="100px;">Produk</th>
+            <th align="center" width="70px;">Harga</th>
+            <th align="center" width="70px;">Jumlah</th>
+            <th align="center" width="70px;">Discount</th>
+            <th align="center" width="70px;">Additional</th>
+            <th align="center" width="70px;">Total</th>
+        </tr>
+        </thead>
+        <!--tbody section is required-->
+        <tbody>
+        {% if (ResultOrder) %}
+            {% set i = 1 %}
+            {% if (ResultOrder) %}
+                {% for item in ResultOrder %}
+                    {% for detail in item.order_item_detail %}
+                        <tr>
+                            <td class="font-value">{{ i }}</td>
+                            <td class="font-value">{{ item.ref_number }}</td>
+                            <td class="font-value">{{ call_helpers_two('DateFormat', item.date_transaction ,"d/m/Y H:i:s" ) }}</td>
+                            <td class="font-value">{{ detail.stock.name }}</td>
+                            <td class="font-value" align="right">{{ call_helpers('set_numberformat',detail.price) }}</td>
+                            <td class="font-value" align="right">{{ call_helpers('set_numberformat',detail.quantity) }} pcs</td>
+                            <td class="font-value" align="right">{{ call_helpers('set_numberformat',detail.price - (detail.price*detail.discount/100)) }}</td>
+                            <td class="font-value" align="right">{{ call_helpers('set_numberformat',detail.additional) }}</td>
+                            <td class="font-value" align="right">{{ detail.total | number_format(0,",",".") }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            {% endif %}
+            <tr>
+                <td colspan="8" class="font-value" align="right">Total</td>
+                <td class="font-value" align="right">{{ call_helpers('set_numberformat',Total) }}</td>
+            </tr>
+        {% endif %}
+        </tbody>
+    </table>
+    <div style="margin-left:600px;">
+        <table>
+            <tr>
+                <td align="center"><strong>{{ Users.branch.city }}, {{ call_helpers('get_DateNow','d F Y') }}</strong></td>
+            </tr>
+            <tr>
+                <td height="50px;">&nbsp;</td>
+            </tr>
+            <tr>
+                <td align="center"><strong>{{ Users.branch.name }}</strong></td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <ul>
+            <li>Sekian laporan dan tagihan atas Watch Care Grand Indonesia terhadap Your Bag Spa</li>
+            <li>Jumlah tagihan tersebut harap dibayarkan dengan transfer ke no rek BCA  8480-1813-88 a/n SANDRA SELVIANA</li>
+            <li>Terima kasih atas perhatian dan kerjasamanya.</li>
+        </ul>
+    </div>
+</div>
+
+</body>
+
+</html>

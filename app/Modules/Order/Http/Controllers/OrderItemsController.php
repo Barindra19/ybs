@@ -362,15 +362,15 @@ class OrderItemsController extends Controller
         $OrderItem->total                           = $GrandTotal;
         $OrderItem->discount                        = $DiscountHeader;
         $OrderItem->additional                      = $AdditionalHeader;
-        if($request->customer){
-            $Customer                               = $request->customer;
-            $CustomerName                           = $OrderItem->customer->name;
-        }else{
-            $Customer                               = 0;
-            $CustomerName                           = "Tanpa Nama";
-        }
-        $OrderItem->customer_id                     = $Customer;
-        $OrderItem->customer_name                   = $CustomerName;
+        // if($request->customer){
+        //     $Customer                               = $request->customer;
+        //     $CustomerName                           = $OrderItem->customer->name;
+        // }else{
+        //     $Customer                               = 0;
+        //     $CustomerName                           = "Tanpa Nama";
+        // }
+        $OrderItem->customer_id                     = 0;
+        $OrderItem->customer_name                   = "";
         $OrderItem->payment                         = $Payment;
         $OrderItem->payment_type_id                 = $PaymentType;
         $OrderItem->branch_id                       = $Users->branch_id;
@@ -387,11 +387,11 @@ class OrderItemsController extends Controller
                 $Discount                           = array();
                 $Additional                         = array();
                 foreach ($OrderItemDetail as $item) {
-                    if($Customer > 0){
-                        if($item->stock->point > 0){
-                            set_TransactionPoint($Customer,$item->stock->point,'IN');
-                        }
-                    }
+                    // if($Customer > 0){
+                    //     if($item->stock->point > 0){
+                    //         set_TransactionPoint($Customer,$item->stock->point,'IN');
+                    //     }
+                    // }
                     $StockInfo                      = StockModel::find($item->stock_id);
                     $LabaBersih                     = $StockInfo->selling_price - $StockInfo->cost_of_good;
                     $LabaBersihTotal                = $LabaBersih * $item->quantity;
@@ -424,7 +424,8 @@ class OrderItemsController extends Controller
                 $CASHBOOK->status                               = 3; //Order
                 $CASHBOOK->date_transaction                     = date('Y-m-d H:i:s');
                 $CASHBOOK->branch_id                            = $Users->branch_id;
-                $CASHBOOK->customer_id                          = $Customer;
+                $CASHBOOK->customer_id                          = 0;
+                // $CASHBOOK->customer_id                          = $Customer;
                 $CASHBOOK->flow                                 = 0; // ACTIVE //
                 $CASHBOOK->created_by                           = Auth::id();
 
@@ -439,31 +440,31 @@ class OrderItemsController extends Controller
                     $Notransaction                          = $CodeAccount.date("ymd").sprintf("%05s",$CASHBOOK->id);
                     $CashBookUpdate                         = CashBookModel::find($CASHBOOK->id);
                     $CashBookUpdate->notransaction          = $Notransaction;
-                    $CashBookUpdate->description            = 'Transaksi dari '.$Notransaction.' oleh '.$CustomerName.' dengan pembayaran sebesar Rp '.number_format(set_clearFormatRupiah($Payment),0,",",".").' dengan Laba bersih sebesar Rp '.number_format(set_clearFormatRupiah($Debit),0,",",".").',-';
+                    $CashBookUpdate->description            = 'Transaksi dari '.$Notransaction;
                     if($CashBookUpdate->save()){
                         set_SaldoBranch($Users->branch_id,$Debit,'IN');
                     }
                 }
                 ### CASHBOOK ###
 
-                if($Customer > 0){
-                    ### Send mail
-                    $TotalOrderItemDetail                           = array_sum($Subtotal);
-                    $EmailParams                            = array(
-                        'Subject'                               => $Users->name." dari Your Bag Spa",
-                        'Views'                                 => "email.invoice_items",
-                        'Users'                                 => $Users,
-                        'To'                                    => $OrderItem->customer->email,
-                        'DateNow'                               => date('d F Y'),
-                        'Order'                                 => $OrderItem,
-                        'Discount'                              => array_sum($Discount),
-                        'TotalOrderDetail'                      => $TotalOrderItemDetail,
-                        'OrderDetail'                           => $OrderItemDetail,
-                        'attachment'                            => ""
-                    );
-                    dispatch(new SendMail($EmailParams));
-                    ### Send mail
-                }
+                // if($Customer > 0){
+                //     ### Send mail
+                //     $TotalOrderItemDetail                           = array_sum($Subtotal);
+                //     $EmailParams                            = array(
+                //         'Subject'                               => $Users->name." dari Your Bag Spa",
+                //         'Views'                                 => "email.invoice_items",
+                //         'Users'                                 => $Users,
+                //         'To'                                    => $OrderItem->customer->email,
+                //         'DateNow'                               => date('d F Y'),
+                //         'Order'                                 => $OrderItem,
+                //         'Discount'                              => array_sum($Discount),
+                //         'TotalOrderDetail'                      => $TotalOrderItemDetail,
+                //         'OrderDetail'                           => $OrderItemDetail,
+                //         'attachment'                            => ""
+                //     );
+                //     dispatch(new SendMail($EmailParams));
+                //     ### Send mail
+                // }
 
                 $data                                       = array(
                     "scsMsg"                                => 'Invoice <strong>['.$OrderItem->ref_number.']</strong> Berhasil terbentuk',

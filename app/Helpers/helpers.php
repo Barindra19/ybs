@@ -1036,4 +1036,22 @@ if (! function_exists('set_TransactionPoint')) {
 }
 
 
+if (! function_exists('get_ListSupplier')) {
+    /**
+     * @return string
+     */
+    function get_ListSupplier()
+    {
+        $Supplier                                     = \App\Modules\Supplier\Models\Supplier::where('is_active','=',1)->get();
+
+        $output                                     = array();
+        $output [0]                                 = 'Pilih Supplier';
+        foreach ($Supplier as $item){
+            $output[$item->id]                    = $item->name;
+        }
+        return $output;
+
+    }
+}
+
 ?>

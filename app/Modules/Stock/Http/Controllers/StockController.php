@@ -130,7 +130,7 @@ class StockController extends Controller
             'stock'                     => 'required',
             'cost_of_good'              => 'required',
             'selling_price'             => 'required',
-            'customer'                  => 'required',
+            'supplier'                  => 'required',
             'brand'                     => 'required',
             'name_of_consignment'       => 'required',
             'restock_date'              => 'required',
@@ -148,7 +148,8 @@ class StockController extends Controller
         $Stock->stock                               = $request->stock;
         $Stock->cost_of_good                        = set_clearFormatRupiah($request->cost_of_good);
         $Stock->selling_price                       = set_clearFormatRupiah($request->selling_price);
-        $Stock->customer_id                         = $request->customer;
+//        $Stock->customer_id                         = $request->customer;
+        $Stock->supplier_id                         = $request->supplier;
         $Stock->restock_date                        = DateFormat($request->restock_date,"Y-m-d");
         $Stock->branch_id                           = $Users->branch_id;
         $Stock->is_active                           = 1;
@@ -156,8 +157,8 @@ class StockController extends Controller
         $Stock->brand                               = $request->brand;
         $Stock->color                               = $request->color;
         $Stock->name_of_consignment                 = $request->name_of_consignment;
-        $Stock->phone                               = $request->phone;
-        $Stock->rekening                            = $request->rekening;
+//        $Stock->phone                               = $request->phone;
+//        $Stock->rekening                            = $request->rekening;
         $Stock->point                               = $request->point;
 
         if($Stock->save()){
@@ -177,7 +178,7 @@ class StockController extends Controller
             'stock'                     => 'required',
             'cost_of_good'              => 'required',
             'selling_price'             => 'required',
-            'customer'                  => 'required',
+            'supplier'                  => 'required',
             'brand'                     => 'required',
             'name_of_consignment'       => 'required',
             'restock_date'              => 'required',
@@ -199,8 +200,8 @@ class StockController extends Controller
         $Stock->brand                               = $request->brand;
         $Stock->color                               = $request->color;
         $Stock->name_of_consignment                 = $request->name_of_consignment;
-        $Stock->phone                               = $request->phone;
-        $Stock->rekening                            = $request->rekening;
+//        $Stock->phone                               = $request->phone;
+//        $Stock->rekening                            = $request->rekening;
         $Stock->point                               = $request->point;
 
         if($Stock->save()){
@@ -272,9 +273,7 @@ class StockController extends Controller
                         "name"                              => $Stock->name,
                         "stock"                             => $Stock->stock,
                         "selling_price"                     => number_format($Stock->selling_price,0,",","."),
-                        "cost_of_good"                      => number_format($Stock->cost_of_good,0,",","."),
-                        "customer_id"                       => $Stock->customer_id,
-                        "customer_name"                     => $Stock->customer->name,
+                        "cost_of_good"                      => number_format($Stock->cost_of_good,0,",",".")
                     ),
                     "message"                               => "OK"
                 );

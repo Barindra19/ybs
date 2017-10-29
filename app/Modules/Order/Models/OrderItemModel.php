@@ -24,4 +24,9 @@ class OrderItemModel extends Model
         return $this->belongsTo('App\Modules\Customer\Models\CustomerModel');
     }
 
+    public function order_item_detail(){
+        return $this->hasMany('App\Modules\Order\Models\OrderItemDetail','order_item_id','id');
+    }
+
+
 }

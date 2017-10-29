@@ -24,6 +24,13 @@ Route::group(['prefix' => 'report/order', 'middleware' => 'auth'], function () {
 
 });
 
+Route::group(['prefix' => 'report/order/item', 'middleware' => 'auth'], function () {
+    Route::get('/','OrderItemController@show')->name('order_reportorderitem');
+    Route::get('/show','OrderItemController@show')->name('order_reportorderitem_show');
+    Route::get('/retrieve/{get}','OrderItemController@retrieve')->name('order_reportorderitem_retrieve');
+
+});
+
 
 Route::group(['prefix' => 'report/transaction', 'middleware' => 'auth'], function () {
     Route::get('/','TransactionController@show')->name('order_reporttransaction');
